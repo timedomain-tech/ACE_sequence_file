@@ -1,4 +1,4 @@
-# ACES 文件说明
+# ACES 文件说明 v1.0
 
 ## 1. 总览
 
@@ -27,7 +27,7 @@
 | start_time | number | 是 | 音符开始时间，以秒为单位 |
 | end_time | number | 是 | 音符结束时间，以秒为单位  |
 | type | string | 否，默认为"phone" | 音符类型，详见音符类型说明 |
-| pitch | number | 否，默认为0 | 音高值，详见音高值说明 |
+| pitch | number | 否 | 音高值，详见音高值说明 |
 | language | string | 否，默认为ch | 音符语言：中文"ch"，英语"en"，日语"jp" |
 | phone | Array | 否 | 当前note音素列表，详见音素说明 |
 | syllable | string | 否 | 当前note音节，详见音节说明 |
@@ -39,9 +39,9 @@
  + "sp" 静音音符，静音音符可以不传
  + "slur" 延音音符，延音音符前面必须要存在发音音符
 ### 2.2 音高值说明
-440标准音对应音高值为69
+440hz标准音对应音高值为69
 ### 2.3 音素说明
-每个note内必须包含一个元音：具体音素信息请参考：https://github.com/timedomain-tech/ACE_phonemes
+每个"phone"类型的note内必须包含一个元音：具体音素信息请参考：https://github.com/timedomain-tech/ACE_phonemes
 ### 2.4 音节说明
 语言为中文或者日语时，可以使用音节而无需传音素列表
 
@@ -49,8 +49,8 @@
 
 ```
 {
-    "start_time": 28,
-    "end_time": 55,
+    "start_time": 1.0,
+    "end_time": 2.0,
     "type": "phone",
     "pitch":65,
     "language":"ch",
@@ -60,8 +60,8 @@
 或者
 ```
 {
-    "start_time": 20,
-    "end_time": 36,
+    "start_time": 1.4,
+    "end_time": 2.8,
     "type": "phone",
     "pitch":65,
     "language":"en",
