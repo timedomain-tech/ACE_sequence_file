@@ -51,18 +51,18 @@ Only can be used when language is Chinese or Japanese, syllable can be used inst
 {
     "start_time": 1.0,
     "end_time": 2.0,
-    "type": "phone",
+    "type": "general",
     "pitch":65,
     "language":"ch",
     "syllable": "la"
 }
 ```
-or
+
 ```
 {
     "start_time": 1.4,
     "end_time": 2.8,
-    "type": "phone",
+    "type": "general",
     "pitch":65,
     "language":"en",
     "phone":[
