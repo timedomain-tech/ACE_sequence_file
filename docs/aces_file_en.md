@@ -26,7 +26,7 @@
 | --- | --- | --- | --- |
 | start_time | number | Yes | Note start time, in seconds |
 | end_time | number | Yes | Note end time, in seconds  |
-| type | string | No, default is "phone" | Note type, see Note Type Description |
+| type | string | No, default is "general" | Note type, see Note Type Description |
 | pitch | number | No | Pitch value, see Pitch Value Description |
 | language | string | No, default is "ch" | Note language: Chinese "ch", English "en", Japanese "jp" |
 | phone | Array | No | List of phonemes for the current note, see Phoneme Description |
@@ -34,16 +34,16 @@
 
 ### 2.1 Note Type Description
 Available note types: 
- + "phone"  Pronunciation note
+ + "general"  General pronunciation note
  + "br" Breath note
  + "sp" Silent note, not required
  + "slur" Slur note, must be preceded by a pronunciation note
 ### 2.2 Pitch Value Description
 The standard pitch of 440hz corresponds to a pitch value of 69
 ### 2.3 Phoneme Description
-Each "phone" type note must contain a vowel: For specific phoneme information, please refer to: https://github.com/timedomain-tech/ACE_phonemes
+Each "general" type note must contain and can only contain one vowel: For specific phoneme information, please refer to: https://github.com/timedomain-tech/ACE_phonemes
 ### 2.4 Syllable Description
-For Chinese or Japanese languages, syllable can be used instead of phoneme lists
+Only can be used when language is Chinese or Japanese, syllable can be used instead of phoneme lists
 
 *Example:*
 
@@ -128,5 +128,22 @@ Example:
         0.3,
         0.1
     ],
+}
+```
+## 4. PAD:
+| Field Name | Field Type | Required | Description |
+| --- | --- | --- | --- |
+| begin | Object | No | See `note` object for details |
+| end | Object | No | See `note` object for details |
+
+Description:  
+PAD is additional information that is usually not required. When the ACES file is used for deep learning model synthesis of singing voices, the note information before and after this segment can be added to obtain better synthesis results.
+
+Example:
+
+```
+{
+    "begin": NOTE,
+    "end": NOTE
 }
 ```
