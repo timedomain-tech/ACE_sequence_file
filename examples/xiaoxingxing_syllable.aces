@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "notes": [
+    {
+      "start_time": 0,
+      "end_time": 0.375,
+      "language": "ch",
+      "pitch": 60,
+      "syllable" : "yi"
+    },
+    {
+      "start_time": 0.375,
+      "end_time": 0.75,
+      "language": "ch",
+      "pitch": 60,
+      "syllable" : "shan"
+    },
+    {
+      "start_time": 0.75,
+      "end_time": 1.125,
+      "language": "ch",
+      "pitch": 67,
+      "syllable" : "yi"
+    },
+    {
+      "start_time": 1.125,
+      "end_time": 1.5,
+      "language": "ch",
+      "pitch": 67,
+      "syllable" : "shan"
+    },
+    {
+      "start_time": 1.5,
+      "end_time": 1.546875,
+      "language": "ch",
+      "pitch": 67,
+      "syllable" : "liang"
+    },
+    {
+      "start_time": 1.546875,
+      "end_time": 1.78125,
+      "type": "slur",
+      "pitch": 69,  
+    },
+    {
+      "start_time": 1.875,
+      "end_time": 2.0625,
+      "language": "ch",
+      "pitch": 69,
+      "syllable" : "jing"
+    },
+    {
+      "start_time": 2.0625,
+      "end_time": 2.4375,
+      "language": "ch",
+      "pitch": 67,
+      "syllable" : "jing"
+    },
+    {
+      "start_time": 3,
+      "end_time": 3.375,
+      "language": "ch",
+      "pitch": 65,
+      "syllable" : "man"
+    },
+    {
+      "start_time": 3.375,
+      "end_time": 3.5625,   
+      "language": "ch",
+      "pitch": 65,
+      "syllable" : "tian"
+    },
+    {
+      "start_time": 3.5625,
+      "end_time": 4.125,
+      "language": "ch",
+      "pitch": 64,
+      "syllable" : "dou"
+    },
+    {
+      "start_time": 4.125,
+      "end_time": 4.3125,
+      "language": "ch",
+      "pitch": 64,
+      "syllable" : "shi"
+    },
+    {
+      "start_time": 4.3125,
+      "end_time": 4.5,
+      "type": "slur",
+      "pitch": 60,
+    },
+    {
+      "start_time": 4.5,
+      "end_time": 4.546875,
+      "language": "ch",
+      "pitch": 60,
+      "syllable" : "xiao"
+    },
+    {
+      "start_time": 4.546875,
+      "end_time": 4.875,
+      "type": "slur",
+      "pitch": 62,
+    },
+    {
+      "start_time": 4.875,
+      "end_time": 5.15625, 
+      "language": "ch",
+      "pitch": 62,
+      "syllable" : "xing"
+    },
+    {
+      "start_time": 5.15625,
+      "end_time": 5.53125,
+      "language": "ch",
+      "pitch": 60,
+      "syllable" : "xing"
+    }
+  ]
+}
