@@ -1,7 +1,7 @@
 ## API 说明文档
 
-[歌手信息列表](singer_info.md)
-[请求文件说明](../../docs/aces_filie.md)
+- [歌手信息列表](/api/docs/singer_info.md)
+- [请求文件说明](/docs/aces_filie.md)
 
 ### 1. 合成接口
 
