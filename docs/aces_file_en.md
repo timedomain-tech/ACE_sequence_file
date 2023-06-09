@@ -110,13 +110,14 @@ Example:
 }
 ```
 
-### 3.3 PIECE_VALUE: Segment Value Representation
+### 3.3 PIECE_VALUE: Piecewise Value Representation
 
 | Field Name | Field Type | Required | Description |
 | --- | --- | --- | --- |
-| start_time | number | Yes | Real start time of the values array |
-| hop_time | number | Yes | Interval between data frames in the values array |
-| values | Array | Yes | Value array, with different value ranges depending on the value type |
+| start_time | number | Yes | The actual starting time of the values array |
+| hop_time | number | Yes | The interval between every two consecutive data frames in the values array |
+| values | Array | Yes | An array of values with different ranges depending on the value type |
+| enable_intervals | Array | Yes | The index intervals of valid data in the values array, including the left and right boundaries |
 
 Example:
 
@@ -126,8 +127,34 @@ Example:
     "hop_time": 0.01,
     "values": [
         0.3,
-        0.1
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+
     ],
+    "enable_intervals": [
+        {
+            "start_index": 1,
+            "end_index": 5
+        },
+        {
+            "start_index": 2,
+            "end_index": 4
+        }
+    ]
 }
 ```
 ## 4. PAD:

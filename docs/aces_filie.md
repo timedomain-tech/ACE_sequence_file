@@ -117,6 +117,7 @@
 | start_time | number | 是 | values数组真实起始时间 |
 | hop_time | number | 是 | values数组中每两个数据帧之间的间隔 |
 | values | Array | 是 | 取值数组，根据不同的值类型具有不同的取值范围 |
+| enable_intervals | Array | 是 | 指values数组中，有效数据的索引区间,  包含左右边界 |
 
 示例：
 
@@ -126,8 +127,34 @@
     "hop_time": 0.01,
     "values": [
         0.3,
-        0.1
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+
     ],
+    "enable_intervals": [
+        {
+            "start_index": 1,
+            "end_index": 5
+        },
+        {
+            "start_index": 2,
+            "end_index": 4
+        }
+    ]
 }
 ```
 ## 4. PAD:
