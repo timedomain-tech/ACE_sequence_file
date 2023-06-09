@@ -6,6 +6,7 @@
       "end_time": 0.375,
       "language": "ch",
       "pitch": 60,
+      "type": "general",
       "syllable" : "yi"
     },
     {
@@ -13,6 +14,7 @@
       "end_time": 0.75,
       "language": "ch",
       "pitch": 60,
+      "type": "general",
       "syllable" : "shan"
     },
     {
@@ -20,6 +22,7 @@
       "end_time": 1.125,
       "language": "ch",
       "pitch": 67,
+      "type": "general",
       "syllable" : "yi"
     },
     {
@@ -27,6 +30,7 @@
       "end_time": 1.5,
       "language": "ch",
       "pitch": 67,
+      "type": "general",
       "syllable" : "shan"
     },
     {
@@ -34,19 +38,21 @@
       "end_time": 1.546875,
       "language": "ch",
       "pitch": 67,
+      "type": "general",
       "syllable" : "liang"
     },
     {
       "start_time": 1.546875,
       "end_time": 1.78125,
       "type": "slur",
-      "pitch": 69,  
+      "pitch": 69
     },
     {
       "start_time": 1.875,
       "end_time": 2.0625,
       "language": "ch",
       "pitch": 69,
+      "type": "general",
       "syllable" : "jing"
     },
     {
@@ -54,6 +60,7 @@
       "end_time": 2.4375,
       "language": "ch",
       "pitch": 67,
+      "type": "general",
       "syllable" : "jing"
     },
     {
@@ -61,13 +68,15 @@
       "end_time": 3.375,
       "language": "ch",
       "pitch": 65,
+      "type": "general",
       "syllable" : "man"
     },
     {
       "start_time": 3.375,
-      "end_time": 3.5625,   
+      "end_time": 3.5625,
       "language": "ch",
       "pitch": 65,
+      "type": "general",
       "syllable" : "tian"
     },
     {
@@ -75,6 +84,7 @@
       "end_time": 4.125,
       "language": "ch",
       "pitch": 64,
+      "type": "general",
       "syllable" : "dou"
     },
     {
@@ -82,32 +92,35 @@
       "end_time": 4.3125,
       "language": "ch",
       "pitch": 64,
+      "type": "general",
       "syllable" : "shi"
     },
     {
       "start_time": 4.3125,
       "end_time": 4.5,
       "type": "slur",
-      "pitch": 60,
+      "pitch": 60
     },
     {
       "start_time": 4.5,
       "end_time": 4.546875,
       "language": "ch",
       "pitch": 60,
+      "type": "general",
       "syllable" : "xiao"
     },
     {
       "start_time": 4.546875,
       "end_time": 4.875,
       "type": "slur",
-      "pitch": 62,
+      "pitch": 62
     },
     {
       "start_time": 4.875,
-      "end_time": 5.15625, 
+      "end_time": 5.15625,
       "language": "ch",
       "pitch": 62,
+      "type": "general",
       "syllable" : "xing"
     },
     {
@@ -115,6 +128,7 @@
       "end_time": 5.53125,
       "language": "ch",
       "pitch": 60,
+      "type": "general",
       "syllable" : "xing"
     }
   ]
