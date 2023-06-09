@@ -40,7 +40,7 @@
       "start_time": 1.546875,
       "end_time": 1.78125,
       "type": "slur",
-      "pitch": 69,  
+      "pitch": 69
     },
     {
       "start_time": 1.875,
@@ -65,7 +65,7 @@
     },
     {
       "start_time": 3.375,
-      "end_time": 3.5625,   
+      "end_time": 3.5625,
       "language": "ch",
       "pitch": 65,
       "syllable" : "tian"
@@ -88,7 +88,7 @@
       "start_time": 4.3125,
       "end_time": 4.5,
       "type": "slur",
-      "pitch": 60,
+      "pitch": 60
     },
     {
       "start_time": 4.5,
@@ -101,11 +101,11 @@
       "start_time": 4.546875,
       "end_time": 4.875,
       "type": "slur",
-      "pitch": 62,
+      "pitch": 62
     },
     {
       "start_time": 4.875,
-      "end_time": 5.15625, 
+      "end_time": 5.15625,
       "language": "ch",
       "pitch": 62,
       "syllable" : "xing"
