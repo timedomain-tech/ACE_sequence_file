@@ -86,6 +86,8 @@ ace_token | string | 是 | 请求token(联系对接人员获得)
 cooperator | string | 是 | 请求方名称(联系对接人员获得)
 mix_info | string | 否 | 可混合调参，选取想混合的音源进行混音操作。混音音源必须在歌手列表和特点说明
 speaker_id | string | 否 | 当mix_info未设置时有效。单一合成音源，参考歌手列表和特点说明，不填默认为"1"。
+file_date | string | 是 | aces文件数据
+
 
 #### 请求示例
 
@@ -120,7 +122,7 @@ mix_str = json.dumps({
     "energy": [[82, 0.7], [1, 0.3]],
     "mel": [[82, 0.7], [1, 0.3]],
 })
-file_url = "/path_to_ace/tts_request_ace1.ace"
+file_url = "/path_to_ace/xiaoxingxing.aces"
 with open(file_url, 'r') as load_f:
     file = json.load(load_f)
 data_dict = {
@@ -149,26 +151,21 @@ sio.disconnect()
 
 #### 响应示例
 
-data格式说明：
+当然，以下是将参数名称、类型和描述整理成表格的方式：
 
-参数名称 | 参数类型 | 参数描述
---------|----------|--------
-audio | string | 返回音频地址
-pst | number | 返回音频的开始时间(根据文件内note时间计算)
+| 参数名称 | 参数类型 | 参数描述 |
+| --- | --- | --- |
+| code | number | 返回的状态码，200表示正常返回。 |
+| error | string | 如果接口返回错误，则会有一个错误信息字符串。 |
+| data | list | 音频数据，list中的结构为： ["audio" : {string}, "pst" : {number}] audio 回音频地址 pst返回音频的开始时间(根据文件内note时间计算) |
+| finished | number | 表示数据是否传输完成，0表示未完成，1表示已完成。 |
+| progress | string | 表示数据传输的进度，可能是一个百分比字符串或者其它形式的表示。 |
 
 ```json
-{
-  "data": [
-    {
-      "audio": "http://engine-ai.oss-cn-beijing.aliyuncs.com/svs%2Fv5%2Fprod%2Fv3%2Fcompose%2Frun_piece_v2023_1681297283190164.ogg?OSSAccessKeyId=LTAI5tF1JfTsJxdtaAb4Scdw&Expires=1681470083&Signature=Hv8tHgYELsVKRvb9n4qjI4c53P4%3D",
-      "pst": 2.803809523809524
-    },
-    {
-      "audio": "http://engine-ai.oss-cn-beijing.aliyuncs.com/svs%2Fv5%2Fprod%2Fv3%2Fcompose%2Frun_piece_v2023_1681297283776864.ogg?OSSAccessKeyId=LTAI5tF1JfTsJxdtaAb4Scdw&Expires=1681470083&Signature=YFWau7XPHMNwF2vlC%2BVa0M%2FuNI0%3D",
-      "pst": 2.803809523809524
-    }
-  ],
-  "code": 200,
-  "error": null,
-  "timestamp": 1681297283983
-}
+连接成功
+{"code": 200, "error": "", "data": "connected","timestamp": 1684835389559,"finished": 0}
+正常返回
+{"code": 200, "error": "", "data": [{"audio": "http://engine-ai.oss-cn-beijing.aliyuncs.com/svs%2Fv5%2Fprod%2Fv3%2Fcompose%2Frun_piece_v2023ckpt_1684835388316222.ogg?OSSAccessKeyId=LTAI5tF1JfTsJxdtaAb4Scdw&Expires=1685008188&Signature=n%2FIMCi25xDzMuWmx3h8wF51N1rc%3D", "pst": 2.803809523809524}], "finished": 0, "progress": "1/1"}
+异常返回
+{"code": 400, "error": "请求错误，cooperator必须存在", "data": "请求错误，cooperator必须存在","timestamp": 1684835389559,"finished": 0}
+```
