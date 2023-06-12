@@ -90,51 +90,61 @@ speaker_id | string | 否 | 当mix_info未设置时有效。单一合成音源�
 #### 请求示例
 
 ```python
+
+import time
 import socketio
-import json
-
-url = "https://api.svsbusiness.com"
-ace_token = "XXXXXXXXXXXXXXXX"
-cooperator = "XXXXXXXXXXXX"
-speaker_id = "3"
-file_url = "/Users/root/demo/xiaoxingxing.aces"
-
-with open(file_url, 'rb') as f:
-    aces_file = f.read()
-
-mix_str = json.dumps({
-    "duration": [[82, 0.7],[1, 0.3]],
-    "pitch": [[82, 0.7],[1, 0.3]],
-    "air": [[82, 0.7],[1, 0.3]],
-    "falsetto": [[82, 0.7],[1, 0.3]],
-    "tension": [[82, 0.7],[1, 0.3]],
-    "energy": [[82, 0.7],[1, 0.3]],
-    "mel": [[82, 0.7],[1, 0.3]],
-})
 
 sio = socketio.Client()
 
-@sio.event
-def connect():
-    print('connection established')
-    sio.emit('ace', {
-        'ace_token': ace_token,
-        'cooperator': cooperator,
-        'speaker_id': speaker_id,
-        'mix_info': mix_str,
-        'ace_file': aces_file,
-    })
 
-@sio.event
-def data(data):
-    print('audio received:', data)
-
-@sio.event
+@sio.on('disconnect')
 def disconnect():
-    print('disconnected from server')
+    print('disconnect ', sio.sid)
 
-sio.connect(url)
+
+@sio.on('connect')
+def on_connect():
+    print("I'm connected to the /compose namespace!")
+
+
+@sio.on('message')
+def on_message(data):
+    print('收到服务器消息: ', data)
+
+mix_str = json.dumps({
+    "duration": [[82, 0.7], [1, 0.3]],
+    "pitch": [[82, 0.7], [1, 0.3]],
+    "air": [[82, 0.7], [1, 0.3]],
+    "falsetto": [[82, 0.7], [1, 0.3]],
+    "tension": [[82, 0.7], [1, 0.3]],
+    "energy": [[82, 0.7], [1, 0.3]],
+    "mel": [[82, 0.7], [1, 0.3]],
+})
+file_url = "/path_to_ace/tts_request_ace1.ace"
+with open(file_url, 'r') as load_f:
+    file = json.load(load_f)
+data_dict = {
+    "ace_token": "XXXXXXXXXXXXXXXX",
+    "cooperator": "XXXXXXXXXXXX",
+    "speaker_id": "3",
+    "mix_info": mix_str,
+    "file_date": file,
+}
+
+
+data = json.dumps(data_dict)
+print('listen task channel')
+ip = "api.svsbusiness.com"
+sio.connect(f'https://{ip}/socket.io',
+            auth={
+                "ace_token": "XXXXXXXXXX",
+            })
+sio.emit('compose', data)
+print("消息发送成功！")
+
 sio.wait()
+sleep(5)
+sio.disconnect()
 ```
 
 #### 响应示例
