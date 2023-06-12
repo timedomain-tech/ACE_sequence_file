@@ -12,8 +12,8 @@
 
 参数名称 | 参数类型 | 是否必填 | 参数描述
 --------|----------|---------|--------
-ace_token | string | 是 | 请求token
-cooperator | string | 是 | 请求方名称
+ace_token | string | 是 | 请求token(联系对接人员获得)
+cooperator | string | 是 | 请求方名称(联系对接人员获得)
 mix_info | string | 否 | 可混合调参，选取想混合的音源进行混音操作。混音音源必须在歌手列表和特点说明
 speaker_id | string | 否 | 当mix_info未设置时有效。单一合成音源，参考歌手列表和特点说明，不填默认为"1"。
 
@@ -82,8 +82,8 @@ websocket接口可以允许用户上传一个总长度5分钟之内且最后一�
 
 参数名称 | 参数类型 | 是否必填 | 参数描述
 --------|----------|---------|--------
-ace_token | string | 是 | 请求token
-cooperator | string | 是 | 请求方名称
+ace_token | string | 是 | 请求token(联系对接人员获得)
+cooperator | string | 是 | 请求方名称(联系对接人员获得)
 mix_info | string | 否 | 可混合调参，选取想混合的音源进行混音操作。混音音源必须在歌手列表和特点说明
 speaker_id | string | 否 | 当mix_info未设置时有效。单一合成音源，参考歌手列表和特点说明，不填默认为"1"。
 
