@@ -12,8 +12,7 @@
 | 文栗     | 男  | 18    | 柔和           |
 | Bianca | 女  | 82    | 有力、强劲       |
 
-
-Copy
+---------
 | Singer Name | Gender | Singer ID | Vocal Characteristics       |
 |-------------|--------|-----------|------------------------------|
 | Xiaoye      | Female | 0         | Soft, Expressive             |
