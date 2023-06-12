@@ -157,15 +157,20 @@ sio.disconnect()
 | --- | --- | --- |
 | code | number | 返回的状态码，200表示正常返回。 |
 | error | string | 如果接口返回错误，则会有一个错误信息字符串。 |
-| data | list | 音频数据，list中的结构为： ["audio" : {string}, "pst" : {number}] audio 回音频地址 pst返回音频的开始时间(根据文件内note时间计算) |
+| data | list | 音频数据，list中的结构为： ["audio" : {string}, "pst" : {number}]<br> audio: 返回音频地址 <br> pst: 返回音频的开始时间(根据文件内note时间计算) |
 | finished | number | 表示数据是否传输完成，0表示未完成，1表示已完成。 |
 | progress | string | 表示数据传输的进度，可能是一个百分比字符串或者其它形式的表示。 |
 
-```json
+
 连接成功
+```json
 {"code": 200, "error": "", "data": "connected","timestamp": 1684835389559,"finished": 0}
+```
 正常返回
+```json
 {"code": 200, "error": "", "data": [{"audio": "http://engine-ai.oss-cn-beijing.aliyuncs.com/svs%2Fv5%2Fprod%2Fv3%2Fcompose%2Frun_piece_v2023ckpt_1684835388316222.ogg?OSSAccessKeyId=LTAI5tF1JfTsJxdtaAb4Scdw&Expires=1685008188&Signature=n%2FIMCi25xDzMuWmx3h8wF51N1rc%3D", "pst": 2.803809523809524}], "finished": 0, "progress": "1/1"}
+```
 异常返回
+```json
 {"code": 400, "error": "请求错误，cooperator必须存在", "data": "请求错误，cooperator必须存在","timestamp": 1684835389559,"finished": 0}
 ```
