@@ -92,26 +92,18 @@ file_date | string | 是 | aces文件数据
 #### 请求示例
 
 ```python
-
-import time
+# coding=utf-8
 import socketio
+import json
 
-sio = socketio.Client()
+url = "https://api.svsbusiness.com/socket.io/"
+ace_token = "XXXXXXXXXXXXXXXXX"
+cooperator = "XXXXXXXXX"
+speaker_id = "3"
+file_url = "path_to_aces"
 
-
-@sio.on('disconnect')
-def disconnect():
-    print('disconnect ', sio.sid)
-
-
-@sio.on('connect')
-def on_connect():
-    print("I'm connected to the /compose namespace!")
-
-
-@sio.on('message')
-def on_message(data):
-    print('收到服务器消息: ', data)
+with open(file_url, 'r') as load_f:
+    aces_file = json.load(load_f)
 
 mix_str = json.dumps({
     "duration": [[82, 0.7], [1, 0.3]],
@@ -122,31 +114,68 @@ mix_str = json.dumps({
     "energy": [[82, 0.7], [1, 0.3]],
     "mel": [[82, 0.7], [1, 0.3]],
 })
-file_url = "/path_to_ace/xiaoxingxing.aces"
-with open(file_url, 'r') as load_f:
-    file = json.load(load_f)
-data_dict = {
-    "ace_token": "XXXXXXXXXXXXXXXX",
-    "cooperator": "XXXXXXXXXXXX",
-    "speaker_id": "3",
-    "mix_info": mix_str,
-    "file_date": file,
-}
+
+sio = socketio.Client()
+
+connect_success = False
+@sio.on('connect', namespace='/api')
+def on_connect():
+    if connect_success:
+        print('建立连接成功')
+    else:
+        print('建立连接失败')
 
 
-data = json.dumps(data_dict)
-print('listen task channel')
-ip = "api.svsbusiness.com"
-sio.connect(f'https://{ip}/socket.io',
+@sio.on('connect_response', namespace='/api')
+def on_connect_response(data):
+    print(data)
+    global connect_success
+    if data.get('code') and data.get('code') != 200:
+        connect_success = False
+        sio.disconnect()
+        print(f'连接异常：{data.get("data")} 主动断开连接')
+    else:
+        connect_success = True
+
+
+@sio.on('disconnect', namespace='/api')
+def on_disconnect():
+    print('服务器断开连接')
+
+
+@sio.on('message', namespace='/api')
+def on_message(data):
+    print('收到服务器消息: ', data)
+    if data.get('code') and data.get('code') != 200:
+        print(f'合成异常退出合成')
+        sio.disconnect()
+
+
+@sio.on('compose_response', namespace='/api')
+def on_compose_response(data):
+    print('收到合成消息: ', data)
+    if data.get('code') and data.get('code') == 200:
+        print(f'合成进度：{data.get("progress")}')
+    if data.get('finished') and data.get('finished') == 1:
+        print(f'本次合成结束')
+        sio.disconnect()
+
+
+sio.connect(url,
             auth={
-                "ace_token": "XXXXXXXXXX",
-            })
-sio.emit('compose', data)
-print("消息发送成功！")
+                "ace_token": ace_token,
+            },
+            namespaces='/api')
 
+socket_data = {
+    'ace_token': ace_token,
+    'cooperator': cooperator,
+    'speaker_id': speaker_id,
+    'mix_info': mix_str,
+    'file_date': aces_file,
+}
+sio.emit('compose', json.dumps(socket_data), namespace='/api')
 sio.wait()
-sleep(5)
-sio.disconnect()
 ```
 
 #### 响应示例
