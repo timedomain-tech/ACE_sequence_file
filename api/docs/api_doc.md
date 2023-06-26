@@ -17,22 +17,23 @@
 | mix_info   | string | 否    | 可混合调参，选取想混合的音源进行混音操作。混音音源必须在歌手列表和特点说明        |
 | speaker_id | string | 否    | 当mix_info未设置时有效。单一合成音源，参考歌手列表和特点说明，不填默认为"1"。 |
 
-**注意**：每个请求文件对应的合成时长需小于15秒，且上传files不可超过4条
+**注意**：每个请求文件对应的合成时长需小于18秒，且上传files不可超过4条
 
 #### 请求示例
 
 ```python
 import requests
 import json
+
 url = "XXXXXXXXXXX"
 mix_str = json.dumps({
-    "duration": [[82, 0.7],[1, 0.3]],
-    "pitch": [[82, 0.7],[1, 0.3]],
-    "air": [[82, 0.7],[1, 0.3]],
-    "falsetto": [[82, 0.7],[1, 0.3]],
-    "tension": [[82, 0.7],[1, 0.3]],
-    "energy": [[82, 0.7],[1, 0.3]],
-    "mel": [[82, 0.7],[1, 0.3]],
+    "duration": [[82, 0.7], [1, 0.3]],
+    "pitch": [[82, 0.7], [1, 0.3]],
+    "air": [[82, 0.7], [1, 0.3]],
+    "falsetto": [[82, 0.7], [1, 0.3]],
+    "tension": [[82, 0.7], [1, 0.3]],
+    "energy": [[82, 0.7], [1, 0.3]],
+    "mel": [[82, 0.7], [1, 0.3]],
 })
 file_url = "/Users/root/demo/xiaoxingxing.aces"
 files = [('file', open(file_url, 'rb')), ('file', open(file_url, 'rb'))]
@@ -41,7 +42,7 @@ data_dict = {
     "cooperator": "XXXXXXXXXXXX",
     "speaker_id": "3",
     "mix_info": mix_str,
-    
+
 }
 resp = requests.request("POST", url=url, files=files, data=data_dict)
 ```
@@ -90,7 +91,6 @@ websocket接口可以允许用户上传一个总长度5分钟之内且最后一�
 | speaker_id | string | 否    | 当mix_info未设置时有效。单一合成音源，参考歌手列表和特点说明，不填默认为"1"。 |
 | file_date  | string | 是    | aces文件数据                                     |
 
-
 #### 请求示例
 
 ```python
@@ -120,6 +120,8 @@ mix_str = json.dumps({
 sio = socketio.Client()
 
 connect_success = False
+
+
 @sio.on('connect', namespace='/api')
 def on_connect():
     if connect_success:
@@ -182,8 +184,6 @@ sio.wait()
 
 #### 响应示例
 
-当然，以下是将参数名称、类型和描述整理成表格的方式：
-
 | 参数名称     | 参数类型   | 参数描述                                                                                                        |
 |----------|--------|-------------------------------------------------------------------------------------------------------------|
 | code     | number | 返回的状态码，200表示正常返回。                                                                                           |
@@ -192,18 +192,45 @@ sio.wait()
 | finished | number | 表示数据是否传输完成，0表示未完成，1表示已完成。                                                                                   |
 | progress | string | 表示数据传输的进度，可能是一个百分比字符串或者其它形式的表示。                                                                             |
 
-
 连接成功
+
 ```json
-{"code": 200, "error": "", "data": "connected","timestamp": 1684835389559,"finished": 0}
+{
+  "code": 200,
+  "error": "",
+  "data": "connected",
+  "timestamp": 1684835389559,
+  "finished": 0
+}
 ```
+
 正常返回
+
 ```json
-{"code": 200, "error": "", "data": [{"audio": "http://engine-ai.oss-cn-beijing.aliyuncs.com/svs%2Fv5%2Fprod%2Fv3%2Fcompose%2Frun_piece_v2023ckpt_1684835388316222.ogg?OSSAccessKeyId=LTAI5tF1JfTsJxdtaAb4Scdw&Expires=1685008188&Signature=n%2FIMCi25xDzMuWmx3h8wF51N1rc%3D", "pst": 2.803809523809524}], "finished": 0, "progress": "1/1"}
+{
+  "code": 200,
+  "error": "",
+  "data": [
+    {
+      "audio": "http://engine-ai.oss-cn-beijing.aliyuncs.com/svs%2Fv5%2Fprod%2Fv3%2Fcompose%2Frun_piece_v2023ckpt_1684835388316222.ogg?OSSAccessKeyId=LTAI5tF1JfTsJxdtaAb4Scdw&Expires=1685008188&Signature=n%2FIMCi25xDzMuWmx3h8wF51N1rc%3D",
+      "pst": 2.803809523809524
+    }
+  ],
+  "finished": 0,
+  "progress": "1/1"
+}
 ```
+
 异常返回
+
 ```json
-{"code": 400, "error": "请求错误，cooperator必须存在", "data": "请求错误，cooperator必须存在","timestamp": 1684835389559,"finished": 0}
+{
+  "code": 400,
+  "error": "请求错误，cooperator必须存在",
+  "data": "请求错误，cooperator必须存在",
+  "timestamp": 1684835389559,
+  "finished": 0
+}
 ```
 
 ### 3. 返回状态码
@@ -226,5 +253,3 @@ sio.wait()
 | socket接口限制整歌合成的长度 | 300s/600s | 最后一个note的结束时间减去第一个note的开始时间小于300s；最后一个note的结束时间小于600s |
 | 并行请求数量            | 20        | 并行请求数量超过限度后会直接返回503                                   |
 | 每个token的qps限制     | 默认3，可联系调整 | 针对每个token限制对算力的占用                                     |
-
-

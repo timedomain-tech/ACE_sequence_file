@@ -1,6 +1,7 @@
 # coding=utf-8
-import socketio
 import json
+
+import socketio
 
 url = "https://api.svsbusiness.com/socket.io/"
 ace_token = "XXXXXXXXXXXXXXXXX"
