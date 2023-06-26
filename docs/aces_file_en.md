@@ -108,7 +108,7 @@ Example:
 | Field Name | Field Type          | Required | Description                                                                             |
 |------------|---------------------|----------|-----------------------------------------------------------------------------------------|
 | user       | Object(PIECE_VALUE) | No       | Custom parameter curve, see `piece_value` object, value range depends on parameter type |
-| envelope   | Object(PIECE_VALUE) | No       | Parameter envelope curve, see `piece_value` object, value range 0-1                     |
+| envelope   | Object(PIECE_VALUE) | No       | Parameter envelope curve, see `piece_value` object, value range 0-2                     |
 
 Example:
 

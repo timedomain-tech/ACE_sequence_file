@@ -107,7 +107,7 @@
 | 字段名      | 字段类型                | 是否必传 | 说明                                       |
 |----------|---------------------|------|------------------------------------------|
 | user     | Object(PIECE_VALUE) | 否    | 自定义参数线, 见 `piece_value` 对象， 取值范围根据参数类型决定 |
-| envelope | Object(PIECE_VALUE) | 否    | 参数包络线, 见 `piece_value` 对象，取值范围0-1        |
+| envelope | Object(PIECE_VALUE) | 否    | 参数包络线, 见 `piece_value` 对象，取值范围0-2        |
 
 示例：
 
