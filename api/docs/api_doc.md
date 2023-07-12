@@ -35,8 +35,12 @@ mix_str = json.dumps({
     "energy": [[82, 0.7], [1, 0.3]],
     "mel": [[82, 0.7], [1, 0.3]],
 })
-file_url = "/Users/root/demo/xiaoxingxing.aces"
-files = [('file', open(file_url, 'rb')), ('file', open(file_url, 'rb'))]
+file_xiaoxingxing = "/Users/root/demo/xiaoxingxing.aces"
+file_twinkletwinkle = "/Users/root/demo/twinkletwinkle.aces"
+files = [
+    ('file', open(file_xiaoxingxing, 'rb')),
+    ('file', open(file_twinkletwinkle, 'rb'))
+]
 data_dict = {
     "ace_token": "XXXXXXXXXXXXXXXX",
     "cooperator": "XXXXXXXXXXXX",
@@ -61,7 +65,7 @@ data格式说明：
   "data": [
     {
       "audio": "http://engine-ai.oss-cn-beijing.aliyuncs.com/svs%2Fv5%2Fprod%2Fv3%2Fcompose%2Frun_piece_v2023_1681297283190164.ogg?OSSAccessKeyId=LTAI5tF1JfTsJxdtaAb4Scdw&Expires=1681470083&Signature=Hv8tHgYELsVKRvb9n4qjI4c53P4%3D",
-      "pst": 2.803809523809524
+      "pst": 1.334760032455542
     },
     {
       "audio": "http://engine-ai.oss-cn-beijing.aliyuncs.com/svs%2Fv5%2Fprod%2Fv3%2Fcompose%2Frun_piece_v2023_1681297283776864.ogg?OSSAccessKeyId=LTAI5tF1JfTsJxdtaAb4Scdw&Expires=1681470083&Signature=YFWau7XPHMNwF2vlC%2BVa0M%2FuNI0%3D",
