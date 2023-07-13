@@ -237,7 +237,75 @@ sio.wait()
 }
 ```
 
-### 3. 返回状态码
+### 3. 调用额度统计
+
+- 请求地址：`https://gateway.svsbusiness.com/bill/quota`
+- 请求方式：`POST`
+
+#### 请求参数说明
+
+| 参数名称       | 参数类型   | 是否必填 | 参数描述                                         |
+|------------|--------|------|----------------------------------------------|
+| ace_token  | string | 是    | 请求token(联系对接人员获得)                            |
+| cooperator | string | 是    | 请求方名称(联系对接人员获得)                              |
+
+
+#### 请求示例
+
+```python
+
+import requests
+
+if __name__ == '__main__':
+    cooperator = "XXXXXXXXXX"
+    ace_token = "XXXXXXXXXXXXXXXXXXXXXX"
+    ip = "gateway.svsbusiness.com"
+    url = "https://{}/bill/quota/".format(ip)
+    data_dict = {
+        "cooperator": cooperator,
+        "ace_token": ace_token,
+    }
+    resp = requests.get(url=url, params=data_dict).text
+    print(resp)
+```
+
+#### 响应示例
+
+data格式说明：
+
+| 参数名称  | 参数类型   | 参数描述               |
+|---------|-----------|----------------------------------------|
+| service | string | 业务类型，通常为2b         |
+| flag | string | 请求方名称              |
+| token | string | 请求token            |
+| charging_strategy | number | 计费策略，1为按量计费；2为包时计费 |
+| charging_expire_time  | string | 包时计费的超时时间          |
+| billing_balance  | number | 按量计费的总额度           |
+| used_amount  | number | 该token已经使用的额度      |
+| qps   | number | 该token的合成每秒数量限制    |
+
+```json
+{
+  "data": [
+    {
+      "service": "XXXXXXXXXXXX",
+      "flag": "XXXXXXXXXXXXXXXXXXXXX",
+      "token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "charging_strategy": 2,
+      "charging_expire_time": "2024-06-30T18:47:59",
+      "billing_balance": 1000,
+      "used_amount": 13,
+      "qps": 3
+    }
+  ],
+  "code": 200,
+  "error": null,
+  "timestamp": 1689241416585
+}
+
+```
+
+### 4. 返回状态码
 
 | 状态码 | 说明                     |
 |-----|------------------------|
@@ -248,7 +316,7 @@ sio.wait()
 | 402 | 合成引擎异常，多数情况为合成文件包含极端数据 |
 | 500 | 服务器内部未知错误              |
 
-### 4. 合成限制条件
+### 5. 合成限制条件
 
 | 限制参数              | 数值        | 说明                                                    |
 |-------------------|-----------|-------------------------------------------------------|
