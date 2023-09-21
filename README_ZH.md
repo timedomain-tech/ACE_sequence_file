@@ -24,7 +24,7 @@ Aces 是一个专为歌声合成设计的文件格式，它简单、开放、用
 欢迎提出贡献和修改建议。你可以开启一个问题或发送电子邮件到 sean.z@timedomain.ai。
 
 ## 额外信息
-我们提供歌声合成的 API 服务，请参考 [api_doc](/api/docs/api_doc_en.md)。如果您有兴趣测试或与我们合作，请发送电子邮件到 sean.z@timedomain.ai。
+我们提供歌声合成的 API 服务，请参考 [api_doc](/api/docs/api_doc.md)。如果您有兴趣测试或与我们合作，请发送电子邮件到 sean.z@timedomain.ai。
 
 ## 许可证
 
