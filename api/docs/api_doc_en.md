@@ -125,9 +125,9 @@ connect_success = False
 @sio.on('connect', namespace='/api')
 def on_connect():
     if connect_success:
-        print('建立连接成功')
+        print('connection success')
     else:
-        print('建立连接失败')
+        print('connection failed')
 
 
 @sio.on('connect_response', namespace='/api')
@@ -137,31 +137,31 @@ def on_connect_response(data):
     if data.get('code') and data.get('code') != 200:
         connect_success = False
         sio.disconnect()
-        print(f'连接异常：{data.get("data")} 主动断开连接')
+        print(f'connection error：{data.get("data")} disconnected')
     else:
         connect_success = True
 
 
 @sio.on('disconnect', namespace='/api')
 def on_disconnect():
-    print('服务器断开连接')
+    print('server disconnected')
 
 
 @sio.on('message', namespace='/api')
 def on_message(data):
-    print('收到服务器消息: ', data)
+    print('message received: ', data)
     if data.get('code') and data.get('code') != 200:
-        print(f'合成异常退出合成')
+        print(f'synthesis failed and exit')
         sio.disconnect()
 
 
 @sio.on('compose_response', namespace='/api')
 def on_compose_response(data):
-    print('收到合成消息: ', data)
+    print('synthesis response: ', data)
     if data.get('code') and data.get('code') == 200:
-        print(f'合成进度：{data.get("progress")}')
+        print(f'synthesis progress：{data.get("progress")}')
     if data.get('finished') and data.get('finished') == 1:
-        print(f'本次合成结束')
+        print(f'synthesis end')
         sio.disconnect()
 
 
@@ -225,8 +225,8 @@ request failed
 ```json
 {
   "code": 400,
-  "error": "请求错误，cooperator必须存在",
-  "data": "请求错误，cooperator必须存在",
+  "error": "request error，cooperator has to be filled",
+  "data": "request error，cooperator has to be filled",
   "timestamp": 1684835389559,
   "finished": 0
 }
