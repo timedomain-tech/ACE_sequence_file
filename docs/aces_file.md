@@ -92,13 +92,13 @@
 
 | 字段名  | 字段类型   | 是否必传 | 说明                                     |
 |------|--------|------|----------------------------------------|
-| user | Object | 否    | 用户自定义音高线, 见 `piece_value` 对象，取值范围30-90 |
+| user | Array(PIECE_VALUE)  | 否    | 用户自定义音高线, 见 `piece_value` 对象，取值范围30-90 |
 
 示例：
 
 ```
 {
-    "user": PIECE_VALUE
+    "user": [PIECE_VALUE]
 }
 ```
 
@@ -106,15 +106,15 @@
 
 | 字段名      | 字段类型                | 是否必传 | 说明                                       |
 |----------|---------------------|------|------------------------------------------|
-| user     | Object(PIECE_VALUE) | 否    | 自定义参数线, 见 `piece_value` 对象， 取值范围根据参数类型决定 |
-| envelope | Object(PIECE_VALUE) | 否    | 参数包络线, 见 `piece_value` 对象，取值范围0-2        |
+| user     | Array(PIECE_VALUE)  | 否    | 自定义参数线, 见 `piece_value` 对象， 取值范围根据参数类型决定 |
+| envelope | Array(PIECE_VALUE)  | 否    | 参数包络线, 见 `piece_value` 对象，取值范围0-2        |
 
 示例：
 
 ```
 {
-    "user": PIECE_VALUE,
-    "envelope": PIECE_VALUE
+    "user": [PIECE_VALUE],
+    "envelope": [PIECE_VALUE]
 }
 ```
 
@@ -125,7 +125,6 @@
 | start_time       | number | 是    | values数组真实起始时间               |
 | hop_time         | number | 是    | values数组中每两个数据帧之间的间隔         |
 | values           | Array  | 是    | 取值数组，根据不同的值类型具有不同的取值范围       |
-| enable_intervals | Array  | 是    | 指values数组中，有效数据的索引区间, 包含左右边界 |
 
 示例：
 
@@ -152,16 +151,6 @@
         0.1,
         0.1,
 
-    ],
-    "enable_intervals": [
-        {
-            "start_index": 1,
-            "end_index": 5
-        },
-        {
-            "start_index": 2,
-            "end_index": 4
-        }
     ]
 }
 ```

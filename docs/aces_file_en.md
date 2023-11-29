@@ -93,13 +93,13 @@ Only can be used when language is Chinese or Japanese, syllable can be used inst
 
 | Field Name | Field Type | Required | Description                                                           |
 |------------|------------|----------|-----------------------------------------------------------------------|
-| user       | Object     | No       | User-defined pitch curve, see `piece_value` object, value range 30-90 |
+| user       | Array(PIECE_VALUE)     | No       | User-defined pitch curve, see `piece_value` object, value range 30-90 |
 
 Example:
 
 ```
 {
-    "user": PIECE_VALUE
+    "user": [PIECE_VALUE]
 }
 ```
 
@@ -107,15 +107,15 @@ Example:
 
 | Field Name | Field Type          | Required | Description                                                                             |
 |------------|---------------------|----------|-----------------------------------------------------------------------------------------|
-| user       | Object(PIECE_VALUE) | No       | Custom parameter curve, see `piece_value` object, value range depends on parameter type |
-| envelope   | Object(PIECE_VALUE) | No       | Parameter envelope curve, see `piece_value` object, value range 0-2                     |
+| user       | Array(PIECE_VALUE) | No       | Custom parameter curve, see `piece_value` object, value range depends on parameter type |
+| envelope   | Array(PIECE_VALUE) | No       | Parameter envelope curve, see `piece_value` object, value range 0-2                     |
 
 Example:
 
 ```
 {
-    "user": PIECE_VALUE,
-    "envelope": PIECE_VALUE
+    "user": [PIECE_VALUE],
+    "envelope": [PIECE_VALUE]
 }
 ```
 
@@ -126,7 +126,6 @@ Example:
 | start_time       | number     | Yes      | The actual starting time of the values array                                                   |
 | hop_time         | number     | Yes      | The interval between every two consecutive data frames in the values array                     |
 | values           | Array      | Yes      | An array of values with different ranges depending on the value type                           |
-| enable_intervals | Array      | Yes      | The index intervals of valid data in the values array, including the left and right boundaries |
 
 Example:
 
@@ -153,16 +152,6 @@ Example:
         0.1,
         0.1,
 
-    ],
-    "enable_intervals": [
-        {
-            "start_index": 1,
-            "end_index": 5
-        },
-        {
-            "start_index": 2,
-            "end_index": 4
-        }
     ]
 }
 ```
