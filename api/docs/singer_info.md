@@ -16,6 +16,8 @@
 | David  | 男   | 80   | 流行、抒情  | 英文   |
 | Lien   | 女   | 81   | 流行、抒情  | 英文   |
 | Bianca | 女   | 82   | 流行、热烈  | 英文   |
+| Naples | 男   | 83   | 摇滚、高能  | 英文   |
+| Sidney | 男   | 84   | Disco、明亮  | 英文   |
 
 
 ---------
@@ -38,3 +40,5 @@
 | David       | Male   | 80        | Pop、Gentle            | English           |
 | Lien        | Female | 81        | Pop、Lyrical           | English           |
 | Bianca      | Female | 82        | Pop、Hot               | English           |
+| Naples      | Male   | 83        | Rock、Powerful         | English           |
+| Sidney      | Male   | 84        | Disco、Bright          | English           |
