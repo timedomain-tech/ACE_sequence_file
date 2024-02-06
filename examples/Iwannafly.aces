@@ -1,0 +1,174 @@
+{
+    "notes": [
+        {
+            "end_time": 1.875,
+            "start_time": 1.150390625,
+            "type": "br"
+        },
+        {
+            "end_time": 2.8125,
+            "language": "en",
+            "phone": [
+                "f",
+                "l",
+                "ay"
+            ],
+            "pitch": 69,
+            "start_time": 1.875,
+            "type": "general"
+        },
+        {
+            "end_time": 3.046875,
+            "pitch": 68,
+            "start_time": 2.8125,
+            "type": "slur"
+        },
+        {
+            "end_time": 3.28125,
+            "pitch": 69,
+            "start_time": 3.046875,
+            "type": "slur"
+        },
+        {
+            "end_time": 3.515625,
+            "pitch": 67,
+            "start_time": 3.28125,
+            "type": "slur"
+        },
+        {
+            "end_time": 4.5703125,
+            "pitch": 70,
+            "start_time": 3.515625,
+            "type": "slur"
+        },
+        {
+            "end_time": 4.6875,
+            "pitch": 67,
+            "start_time": 4.5703125,
+            "type": "slur"
+        },
+        {
+            "end_time": 4.8046875,
+            "pitch": 65,
+            "start_time": 4.6875,
+            "type": "slur"
+        },
+        {
+            "end_time": 5.15625,
+            "pitch": 62,
+            "start_time": 4.8046875,
+            "type": "slur"
+        },
+        {
+            "end_time": 5.625,
+            "start_time": 5.328125,
+            "type": "br"
+        },
+        {
+            "end_time": 5.9375,
+            "language": "en",
+            "phone": [
+                "hh",
+                "ay"
+            ],
+            "pitch": 69,
+            "start_time": 5.625,
+            "type": "general"
+        },
+        {
+            "end_time": 6.25,
+            "language": "en",
+            "phone": [
+                "w",
+                "aa"
+            ],
+            "pitch": 70,
+            "start_time": 5.9375,
+            "type": "general"
+        },
+        {
+            "end_time": 6.5625,
+            "language": "en",
+            "phone": [
+                "n",
+                "ah"
+            ],
+            "pitch": 72,
+            "start_time": 6.25,
+            "type": "general"
+        },
+        {
+            "end_time": 6.6796875,
+            "language": "en",
+            "phone": [
+                "f",
+                "l",
+                "ay"
+            ],
+            "pitch": 67,
+            "start_time": 6.5625,
+            "type": "general"
+        },
+        {
+            "end_time": 6.875,
+            "pitch": 69,
+            "start_time": 6.6796875,
+            "type": "slur"
+        },
+        {
+            "end_time": 6.9921875,
+            "pitch": 67,
+            "start_time": 6.875,
+            "type": "slur"
+        },
+        {
+            "end_time": 7.1875,
+            "pitch": 69,
+            "start_time": 6.9921875,
+            "type": "slur"
+        },
+        {
+            "end_time": 7.3046875,
+            "pitch": 67,
+            "start_time": 7.1875,
+            "type": "slur"
+        },
+        {
+            "end_time": 8.3203125,
+            "pitch": 69,
+            "start_time": 7.3046875,
+            "type": "slur"
+        },
+        {
+            "end_time": 8.4375,
+            "pitch": 67,
+            "start_time": 8.3203125,
+            "type": "slur"
+        },
+        {
+            "end_time": 8.5546875,
+            "pitch": 65,
+            "start_time": 8.4375,
+            "type": "slur"
+        },
+        {
+            "end_time": 8.671875,
+            "pitch": 62,
+            "start_time": 8.5546875,
+            "type": "slur"
+        },
+        {
+            "end_time": 8.7890625,
+            "pitch": 60,
+            "start_time": 8.671875,
+            "type": "slur"
+        },
+        {
+            "end_time": 9.31640625,
+            "pitch": 57,
+            "start_time": 8.7890625,
+            "type": "slur"
+        }
+    ],
+    "version": 1.1
+}
