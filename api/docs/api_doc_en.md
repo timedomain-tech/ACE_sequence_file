@@ -1,7 +1,7 @@
 ## API Documentation
 
 - [List of Singers](/api/docs/singer_info.md)
-- [File Request Explanation](/docs/aces_file.md)
+- [Request File Explanation](/docs/aces_file.md)
 
 ### 1. Synthesis API
 
@@ -74,7 +74,7 @@ Data format explanation:
 }
 ```
 
-### 2. Websocket API
+### 2. Websocket API （Deprecated）
 
 The Websocket API allows users to upload an aces file with a total length of less than 5 minutes and the last note ending time less than 10 minutes. During the connection, synthesized audio will be continuously sent to the user until the last piece is synthesized, after which the server will disconnect.
 
