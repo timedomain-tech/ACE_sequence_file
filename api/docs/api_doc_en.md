@@ -1,7 +1,7 @@
 ## API Documentation
 
 - [List of Singers](/api/docs/singer_info.md)
-- [Request File Explanation](/docs/aces_file.md)
+- [Request File Explanation](/docs/aces_file_en.md)
 
 ### 1. Synthesis API
 
