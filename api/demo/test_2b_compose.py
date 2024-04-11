@@ -12,10 +12,10 @@ mix_str = json.dumps({
     "energy": [[82, 0.7], [1, 0.3]],
     "mel": [[82, 0.7], [1, 0.3]],
 })
-file_url = "twinkletwinkle.aces"
-files = [('file', open(file_url, 'rb')), ('file', open(file_url, 'rb'))]
-ace_token = "XXXXXXXXXXXXXXXXXXX"
-cooperator = "XXXXXXX"
+file_url = "examples/Iwannafly.aces"
+files = [('file', open(file_url, 'rb'))]
+ace_token = "xxxx"
+cooperator = "xxxx"
 data_dict = {
     "ace_token": ace_token,
     "cooperator": cooperator,

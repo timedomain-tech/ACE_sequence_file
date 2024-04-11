@@ -5,7 +5,7 @@
 
 ### 1. Synthesis API
 
-- Request URL: `https://api.svsbusiness.com/engine/api/engine/2b_compose`
+- Request URL: `https://api-lora-us.svsbusiness.com/engine/api/engine/2b_compose`
 - Request Method: `POST`
 
 #### Request Parameters
