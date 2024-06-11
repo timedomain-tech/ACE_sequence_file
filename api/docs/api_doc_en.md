@@ -10,11 +10,11 @@
 
 #### Request Parameters
 
-| Parameter Name | Type   | Required | Description                                                                 |
-| -------------- | ------ | -------- | --------------------------------------------------------------------------- |
-| ace_token      | string | Yes      | Request token (Contact the liaison to obtain)                                |
-| cooperator     | string | Yes      | Requester name (Contact the liaison to obtain)                               |
-| mix_info       | string | No       | Parameters for mixed tuning, selecting the sources you want to mix. Must be on the singer list and feature description |
+| Parameter Name | Type   | Required | Description                                                                                                                             |
+|----------------|--------|----------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| ace_token      | string | Yes      | Request token (Contact the liaison to obtain)                                                                                           |
+| cooperator     | string | Yes      | Requester name (Contact the liaison to obtain)                                                                                          |
+| mix_info       | string | No       | Parameters for mixed tuning, selecting the sources you want to mix. Must be on the singer list and feature description                  |
 | speaker_id     | string | No       | Effective when `mix_info` is not set. Single source of synthesis, refer to the list of singers and feature description. Default is "1". |
 
 **Note**: Each request file must have a synthesis duration shorter than 18 seconds, and the number of uploaded files should not exceed 4.
@@ -60,7 +60,7 @@ mix_str = json.dumps({
     "mel": [[82, 0.7], [1, 0.3]],
 })
 file_url = "/Users/root/demo/xiaoxingxing.aces"
-files = [('file', open(file_url, 'rb')), ('file', open(file_url, 'rb'))]
+files = [('file', open(file_url, 'rb'))]
 data_dict = {
     "ace_token": "XXXXXXXXXXXXXXXX",
     "cooperator": "XXXXXXXXXXXX",
@@ -75,10 +75,10 @@ resp = requests.request("POST", url=url, files=files, data=data_dict)
 
 Data format explanation:
 
-| Parameter Name | Type    | Description                              |
-| -------------- | ------- | ---------------------------------------- |
-| audio          | string  | Audio URL returned                       |
-| pst            | number  | Start time of the audio (calculated based on the notes in the file) |
+| Parameter Name | Type   | Description                                                         |
+|----------------|--------|---------------------------------------------------------------------|
+| audio          | string | Audio URL returned                                                  |
+| pst            | number | Start time of the audio (calculated based on the notes in the file) |
 
 ```json
 {
@@ -98,180 +98,90 @@ Data format explanation:
 }
 ```
 
-### 2. Websocket API （Deprecated）
 
-The Websocket API allows users to upload an aces file with a total length of less than 5 minutes and the last note ending time less than 10 minutes. During the connection, synthesized audio will be continuously sent to the user until the last piece is synthesized, after which the server will disconnect.
+### 2. Request Example
 
-- Request URL: `https://api.svsbusiness.com/socket.io`
-- Request Method: `socket io`
+- Request：`https://gateway.svsbusiness.com/bill/quota`
+- Request Method：`POST`
 
 #### Request Parameters
 
-| Parameter Name | Type   | Required | Description                                                                 |
-| -------------- | ------ | -------- | --------------------------------------------------------------------------- |
-| ace_token      | string | Yes      | Request token (Contact the liaison to obtain)                                |
-| cooperator     | string | Yes      | Requester name (Contact the liaison to obtain)                               |
-| mix_info       | string | No       | Voice blending feature, which allows the selection of different singers for voice fusion, as explained below. |
-| speaker_id     | string | No       | Effective when `mix_info` is not set. Single source of synthesis, refer to the list of singers and feature description. Default is "1". |
-| file_data      | string | Yes      | Data of the aces file                                                        |
+| Parameter Name | Type   | Required | Description                                    |
+|----------------|--------|----------|------------------------------------------------|
+| ace_token      | string | Yes      | Request token (Contact the liaison to obtain)  |
+| cooperator     | string | Yes      | Requester name (Contact the liaison to obtain) |
+
 
 #### Request Example
 
 ```python
-# coding=utf-8
-import socketio
-import json
 
-url = "https://api.svsbusiness.com/socket.io/"
-ace_token = "XXXXXXXXXXXXXXXXX"
-cooperator = "XXXXXXXXX"
-speaker_id = "3"
-file_url = "path_to_aces"
+import requests
 
-with open(file_url, 'r') as load_f:
-    aces_file = json.load(load_f)
-
-mix_str = json.dumps({
-    "duration": [[82, 0.7], [1, 0.3]],
-    "pitch": [[82, 0.7], [1, 0.3]],
-    "air": [[82, 0.7], [1, 0.3]],
-    "falsetto": [[82, 0.7], [1, 0.3]],
-    "tension": [[82, 0.7], [1, 0.3]],
-    "energy": [[82, 0.7], [1, 0.3]],
-    "mel": [[82, 0.7], [1, 0.3]],
-})
-
-sio = socketio.Client()
-
-connect_success = False
-
-
-@sio.on('connect', namespace='/api')
-def on_connect():
-    if connect_success:
-        print('connection success')
-    else:
-        print('connection failed')
-
-
-@sio.on('connect_response', namespace='/api')
-def on_connect_response(data):
-    print(data)
-    global connect_success
-    if data.get('code') and data.get('code') != 200:
-        connect_success = False
-        sio.disconnect()
-        print(f'connection error：{data.get("data")} disconnected')
-    else:
-        connect_success = True
-
-
-@sio.on('disconnect', namespace='/api')
-def on_disconnect():
-    print('server disconnected')
-
-
-@sio.on('message', namespace='/api')
-def on_message(data):
-    print('message received: ', data)
-    if data.get('code') and data.get('code') != 200:
-        print(f'synthesis failed and exit')
-        sio.disconnect()
-
-
-@sio.on('compose_response', namespace='/api')
-def on_compose_response(data):
-    print('synthesis response: ', data)
-    if data.get('code') and data.get('code') == 200:
-        print(f'synthesis progress：{data.get("progress")}')
-    if data.get('finished') and data.get('finished') == 1:
-        print(f'synthesis end')
-        sio.disconnect()
-
-
-sio.connect(url,
-            auth={
-                "ace_token": ace_token,
-            },
-            namespaces='/api')
-
-socket_data = {
-    'ace_token': ace_token,
-    'cooperator': cooperator,
-    'speaker_id': speaker_id,
-    'mix_info': mix_str,
-    'file_date': aces_file,
-}
-sio.emit('compose', json.dumps(socket_data), namespace='/api')
-sio.wait()
+if __name__ == '__main__':
+    cooperator = "XXXXXXXXXX"
+    ace_token = "XXXXXXXXXXXXXXXXXXXXXX"
+    ip = "gateway.svsbusiness.com"
+    url = "https://{}/bill/quota/".format(ip)
+    data_dict = {
+        "cooperator": cooperator,
+        "ace_token": ace_token,
+    }
+    resp = requests.get(url=url, params=data_dict).text
+    print(resp)
 ```
 
 #### Response Example
 
-| Parameter Name | Type    | Description                                                                          |
-| -------------- | ------- | ------------------------------------------------------------------------------------ |
-| code           | number  | Status code returned, 200 indicates normal return.                                   |
-| error          | string  | If the API returns an error, there will be an error message string.                  |
-| data           | list    | Audio data, the structure within the list is: ["audio": {string}, "pst": {number}]   |
-| finished       | number  | Indicates whether the data transmission is complete, 0 for incomplete, 1 for complete |
-| progress       | string  | Indicates the progress of data transmission, could be a percentage string or other forms. |
+Data format explanation:
 
-connection established
-```json
-{
-  "code": 200,
-  "error": "",
-  "data": "connected",
-  "timestamp": 1684835389559,
-  "finished": 0
-}
-```
-
-request success
+| Parameter Name       | Type   | Description                                                                                  |
+|----------------------|--------|----------------------------------------------------------------------------------------------|
+| service              | string | Business type, usually 2b                                                                    |
+| flag                 | string | request flag                                                                                 |
+| token                | string | request token                                                                                |
+| charging_strategy    | number | billing strategy, where 1 is based on quantity billing; 2 is the hourly billing for packages |
+| charging_expire_time | string | The timeout period for charging during package time                                          |
+| billing_balance      | number | The total amount of billing based on quantity                                                |
+| used_amount          | number | The amount already used by this token                                                        |
+| qps                  | number | The limit on the number of tokens synthesized per second for this token                      |
 
 ```json
 {
-  "code": 200,
-  "error": "",
   "data": [
     {
-      "audio": "http://engine-ai.oss-cn-beijing.aliyuncs.com/svs%2Fv5%2Fprod%2Fv3%2Fcompose%2Frun_piece_v2023ckpt_1684835388316222.ogg?OSSAccessKeyId=LTAI5tF1JfTsJxdtaAb4Scdw&Expires=1685008188&Signature=n%2FIMCi25xDzMuWmx3h8wF51N1rc%3D",
-      "pst": 2.803809523809524
+      "service": "XXXXXXXXXXXX",
+      "flag": "XXXXXXXXXXXXXXXXXXXXX",
+      "token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "charging_strategy": 2,
+      "charging_expire_time": "2024-06-30T18:47:59",
+      "billing_balance": 1000,
+      "used_amount": 13,
+      "qps": 3
     }
   ],
-  "finished": 0,
-  "progress": "1/1"
+  "code": 200,
+  "error": null,
+  "timestamp": 1689241416585
 }
+
 ```
-
-request failed
-
-```json
-{
-  "code": 400,
-  "error": "request error，cooperator has to be filled",
-  "data": "request error，cooperator has to be filled",
-  "timestamp": 1684835389559,
-  "finished": 0
-}
-```
-
 ### 3. Response Status Codes
 
-| Status Code | Description                                                       |
-| ----------- | ----------------------------------------------------------------- |
-| 200         | Request successful                                                |
-| 503         | Number of concurrent requests exceeds limit                       |
-| 400         | Request parameters do not conform to the documentation            |
-| 429         | Invalid token                                                     |
+| Status Code | Description                                                        |
+|-------------|--------------------------------------------------------------------|
+| 200         | Request successful                                                 |
+| 503         | Number of concurrent requests exceeds limit                        |
+| 400         | Request parameters do not conform to the documentation             |
+| 429         | Invalid token                                                      |
 | 402         | Synthesis engine exception, mostly due to extreme data in the file |
-| 500         | Internal server error                                             |
+| 500         | Internal server error                                              |
 
 ### 4. Synthesis Constraints
 
-| Constraint               | Value      | Description                                                                       |
-| ------------------------ | ---------- | --------------------------------------------------------------------------------- |
-| Limit on the number of pieces | 4        | The number of pieces in each request cannot exceed this limit                     |
-| Limit on the length of each piece | 18s    | The length of each piece cannot exceed this time limit                            |
-| Socket API length constraint | 300s/600s | The last note's end time minus the first note's start time must be less than 300s; the last note's end time must be less than 600s |
-| Concurrent request limit  | 20        | Exceeding this limit will result in a
+| Constraint                        | Value                          | Description                                                   |
+|-----------------------------------|--------------------------------|---------------------------------------------------------------|
+| Limit on the number of pieces     | 4                              | The number of pieces in each request cannot exceed this limit |
+| Limit on the length of each piece | 18s                            | The length of each piece cannot exceed this time limit        |
+| Concurrent request limit          | 20                             | Exceeding this limit will result in a 503 error               |
+| query per second for single token | default 3，contact us to adjust | Exceeding this limit will not be allowed                      |
