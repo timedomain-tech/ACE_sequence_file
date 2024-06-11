@@ -91,15 +91,17 @@ Only can be used when language is Chinese or Japanese, syllable can be used inst
 
 ### 3.1 PITCH: Pitch Representation
 
-| Field Name | Field Type | Required | Description                                                           |
-|------------|------------|----------|-----------------------------------------------------------------------|
-| user       | Array(PIECE_VALUE)     | No       | User-defined pitch curve, see `piece_value` object, value range 30-90 |
+| Field Name | Field Type         | Required | Description                                                            |
+|------------|--------------------|----------|------------------------------------------------------------------------|
+| user       | Array(PIECE_VALUE) | No       | User-defined pitch curve, see `piece_value` object, value range 30-90  |
+| delta      | Array(PIECE_VALUE) | No       | User-defined pitch shift, see `piece_value` object, value range [-4,4] |
 
 Example:
 
 ```
 {
     "user": [PIECE_VALUE]
+    "delta": [PIECE_VALUE]
 }
 ```
 

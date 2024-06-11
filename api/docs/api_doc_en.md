@@ -99,9 +99,9 @@ Data format explanation:
 ```
 
 
-### 2. Request Example
+### 2. Quota statistics
 
-- Request：`https://gateway.svsbusiness.com/bill/quota`
+- Request：`https://gateway-us.svsbusiness.com/bill/quota`
 - Request Method：`POST`
 
 #### Request Parameters
@@ -121,7 +121,7 @@ import requests
 if __name__ == '__main__':
     cooperator = "XXXXXXXXXX"
     ace_token = "XXXXXXXXXXXXXXXXXXXXXX"
-    ip = "gateway.svsbusiness.com"
+    ip = "gateway-us.svsbusiness.com"
     url = "https://{}/bill/quota/".format(ip)
     data_dict = {
         "cooperator": cooperator,
