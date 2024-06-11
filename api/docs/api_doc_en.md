@@ -99,7 +99,7 @@ Data format explanation:
 ```
 
 
-### 2. Request Example
+### 2. Quota statistics
 
 - Request：`https://gateway.svsbusiness.com/bill/quota`
 - Request Method：`POST`
