@@ -7,7 +7,7 @@ EndPoint_US = "https://api-lora-us.svsbusiness.com/engine/api/engine/2b_compose"
 
 EndPoint = EndPoint_China
 
-ACE_TOEKN = "xxxxxx"
+ACE_TOEKN = "xxxxx"
 FLAG = "xxxx"
 
 

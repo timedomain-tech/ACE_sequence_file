@@ -70,3 +70,4 @@ websocket-client==1.2.1
 widgetsnbextension==3.5.2
 soundfile==0.12.1
 numpy==1.26.4
+mido

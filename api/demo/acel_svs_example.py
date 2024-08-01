@@ -1,6 +1,7 @@
 import json
 import requests
 
+import os
 import soundfile as sf
 from io import BytesIO
 
@@ -10,7 +11,7 @@ EndPoint_US = "https://api-lora-us.svsbusiness.com/engine/api/engine/2b_compose"
 
 EndPoint = EndPoint_China
 
-ACE_TOEKN = "xxxxx"
+ACE_TOEKN = "xxxxxxx"
 FLAG = "xxxx"
 
  
@@ -65,13 +66,10 @@ def one_piece_compose(aces_json):
     return pst, audio_data, samplerate
 
 
-if __name__ == '__main__':
-     
-    acel = json.loads(open('api/demo/test.acel', 'r').read())
-    
+def rendering_ace_list(ace_list, save_to_path):
     vocal_offset = None
     concat_audio = []
-    for aces in acel:
+    for aces in ace_list:
         pst, audio_data, samplerate = one_piece_compose(aces)
 
         if vocal_offset is None:
@@ -87,9 +85,17 @@ if __name__ == '__main__':
             
             concat_audio.extend(audio_data)
 
-    sf.write('api/demo/concat.wav', concat_audio, samplerate)
-
+    sf.write(save_to_path, concat_audio, samplerate)
     print("In relation to the accompaniment, the vocal offset is: ", vocal_offset)
+
+
+if __name__ == '__main__':
+    current_file_path = os.path.abspath(__file__)
+    current_folder_path = os.path.dirname(current_file_path)
+    acel_path = os.path.join(current_folder_path, "test.acel")
+
+    acel = json.loads(open(acel_path, 'r').read())  
+    rendering_ace_list(acel, 'api/demo/test.wav')
 
 
             
