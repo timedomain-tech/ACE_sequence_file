@@ -5,7 +5,7 @@ import os
 from acel_svs_example import rendering_ace_list
 
 
-# 多轨默认获取第一轨
+# 多轨默认获取第一个有效轨道
 def midi2json(mid_path, json_track_id=0):
 
     mid = mido.MidiFile(mid_path)
@@ -23,8 +23,8 @@ def midi2json(mid_path, json_track_id=0):
     note_json_tracks = []
 
     for track_id, track in enumerate(mid.tracks):
-        if track_id == 0:
-            continue
+        # if track_id == 0:
+        #     continue
 
         lyric_list = []
         note_list = []
@@ -67,8 +67,8 @@ def midi2json(mid_path, json_track_id=0):
             note_item["word"] = lyric
 
             note_json.append(note_item)
-
-        note_json_tracks.append(note_json)
+        if len(note_json) > 0:
+            note_json_tracks.append(note_json)
 
     if len(note_json_tracks) == 0:
         print("no tracks found!")
