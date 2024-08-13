@@ -86,7 +86,15 @@ def rendering_ace_list(ace_list, save_to_path):
             concat_audio.extend(audio_data)
 
     sf.write(save_to_path, concat_audio, samplerate)
-    print("In relation to the accompaniment, the vocal offset is: ", vocal_offset)
+    print("In relation to the project, the vocal offset is: ", vocal_offset)
+
+    explanation = (
+        f"for example:  \n"
+        f"   If the accompaniment starts at 1.2 seconds relative to the project \n"
+        f"   The vocal starts at 2 seconds relative to the project \n"
+        f"   The vocal actually starts 0.8 seconds after the accompaniment."
+    )
+    print(explanation)
 
 
 if __name__ == '__main__':
