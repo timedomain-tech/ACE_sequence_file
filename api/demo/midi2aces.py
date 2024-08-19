@@ -202,6 +202,8 @@ def cut_aces(aces):
 
 
 if __name__ == "__main__":
+    # 请在acel_svs_example.py中填写token和flag
+    print("please input token and flag in acel_svs_example.py\n")
 
     current_file_path = os.path.abspath(__file__)
     current_folder_path = os.path.dirname(current_file_path)
