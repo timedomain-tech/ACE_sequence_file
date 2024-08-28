@@ -145,7 +145,11 @@ def cut_aces(aces):
                 if note["start_time"] - last_note["end_time"] > CORASE_SPACE:
                     corase_result.append(temp_list)
                     temp_list = []
-                temp_list.append(note)
+                if i == len(list_to_cut) - 1:
+                    temp_list.append(note)
+                    corase_result.append(temp_list)
+                else:
+                    temp_list.append(note)
 
         return corase_result
          
