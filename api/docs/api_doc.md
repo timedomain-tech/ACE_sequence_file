@@ -16,6 +16,7 @@
 | cooperator | string | 是    | 请求方名称(联系对接人员获得)                              |
 | mix_info   | string | 否    | 声线混合功能，可以选择不同的歌手进行声线融合，见下方说明                 |
 | speaker_id | string | 否    | 当mix_info未设置时有效。单一合成音源，参考歌手列表和特点说明，不填默认为"1"。 |
+| extra      | string | 否    | 用户可以填入任意字符串，该字符串会填写到返回数据结构中                  |
 
 **注意**：每个请求文件对应的合成时长需小于18秒，且上传files不可超过4条
 
@@ -60,6 +61,9 @@ mix_str = json.dumps({
     "energy": [[82, 0.7], [1, 0.3]],
     "mel": [[82, 0.7], [1, 0.3]],
 })
+extra_str = json.dumps(
+    {"request_id": "abcd1234"}
+)
 file_url = "/Users/root/demo/xiaoxingxing.aces"
 files = [('file', open(file_url, 'rb'))]
 data_dict = {
@@ -67,7 +71,7 @@ data_dict = {
     "cooperator": "XXXXXXXXXXXX",
     "speaker_id": "3",
     "mix_info": mix_str,
-
+    "extra": extra_str,
 }
 resp = requests.request("POST", url=url, files=files, data=data_dict)
 ```
@@ -95,7 +99,8 @@ data格式说明：
   ],
   "code": 200,
   "error": null,
-  "timestamp": 1681297283983
+  "timestamp": 1681297283983,
+  "extra": "{\"request_id\": \"abcd1234\"}"
 }
 ```
 
