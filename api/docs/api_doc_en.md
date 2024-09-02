@@ -16,6 +16,7 @@
 | cooperator     | string | Yes      | Requester name (Contact the liaison to obtain)                                                                                          |
 | mix_info       | string | No       | Parameters for mixed tuning, selecting the sources you want to mix. Must be on the singer list and feature description                  |
 | speaker_id     | string | No       | Effective when `mix_info` is not set. Single source of synthesis, refer to the list of singers and feature description. Default is "1". |
+| extra          | string | 否        | Users can input any string, which will be filled into the returned data structure                                                       |
 
 **Note**: Each request file must have a synthesis duration shorter than 18 seconds, and the number of uploaded files should not exceed 4.
 
@@ -59,6 +60,9 @@ mix_str = json.dumps({
     "energy": [[82, 0.7], [1, 0.3]],
     "mel": [[82, 0.7], [1, 0.3]],
 })
+extra_str = json.dumps(
+    {"request_id": "abcd1234"}
+)
 file_url = "/Users/root/demo/xiaoxingxing.aces"
 files = [('file', open(file_url, 'rb'))]
 data_dict = {
@@ -66,7 +70,7 @@ data_dict = {
     "cooperator": "XXXXXXXXXXXX",
     "speaker_id": "3",
     "mix_info": mix_str,
-
+    "extra": extra_str,
 }
 resp = requests.request("POST", url=url, files=files, data=data_dict)
 ```
@@ -94,7 +98,9 @@ Data format explanation:
   ],
   "code": 200,
   "error": null,
-  "timestamp": 1681297283983
+  "timestamp": 1681297283983,
+  "extra": "{\"request_id\": \"abcd1234\"}"
+
 }
 ```
 
