@@ -177,3 +177,18 @@ Example:
     "end": NOTE
 }
 ```
+
+## 5. note rules:
+*definition：*
+Each note has only a unique vowel, and the consonants before the vowel in this note are called pre consonants. The consonants after the vowel in this note are called post consonants
+
+### 5.1 Each note must have sufficient length, notes less than 0.02s have a high probability of experiencing synthesis anomalies
+### 5.2 Pitch must be in the range of 30 to 90
+### 5.3 The language field only supports ch \ en \ jp \ spa
+### 5.4 Each note's phone must be legal, and the list of legal phones varies for different languages
+### 5.5 Each note must have exactly one vowel
+### 5.6 If you want to adjust consonant_time_head or consonant_time_tail, you need to carefully check: the number of pre consonants in this note is equal to the number of elements in consonant_time_head; The number of post_consonants in this note is equal to the number of elements in consonant_time_tail
+### 5.7 Due to internal logic, we will merge the post_consonant of each note with the pre_consonant of the next note for calculation. Therefore, we need to ensure that the length of this note is greater than the consonant_time_tail length of this note plus the consonant_time_head length of the next note
+### 5.8 Each aces file can only synthesize a notes list of no more than 18 seconds
+### 5.9 Speaker information must be provided
+### 5.10 If you want to use piece_params field, you need to carefully check that the time range of piece_params cannot exceed the time range of the note list
