@@ -181,7 +181,7 @@ Data format explanation:
 | 400         | Request parameters do not conform to the documentation             |
 | 429         | Invalid token                                                      |
 | 402         | Synthesis engine exception, mostly due to extreme data in the file |
-| 500         | Internal server error                                              |
+| 453         | Internal server error                                              |
 
 ### 4. Synthesis Constraints
 
