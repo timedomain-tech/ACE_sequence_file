@@ -205,6 +205,16 @@ def cut_aces(aces):
     return aces_list
 
 
+    # filter the note shorter than 0.02s
+def filter_short_note(aces):
+    filtered_notes = []
+    for note in aces["notes"]:
+        if note["end_time"] - note["start_time"] > 0.02:
+            filtered_notes.append(note)
+    aces["notes"] = filtered_notes
+    return aces
+  
+
 if __name__ == "__main__":
     # 请在acel_svs_example.py中填写token和flag
     print("please input token and flag in acel_svs_example.py\n")
@@ -215,6 +225,11 @@ if __name__ == "__main__":
     mid_path = os.path.join(current_folder_path, "红昭愿.mid")
 
     long_aces = midi2aces(mid_path)
+    original_length = len(long_aces["notes"])
+    long_aces = filter_short_note(long_aces)
+    if original_length != len(long_aces["notes"]):
+        print("!!!! notes shorter than 0.02s is filtered, notes number changed from {} to {}".format(original_length, len(long_aces["notes"])))
+
     cutted_aces = cut_aces(long_aces)
 
     rendering_ace_list(cutted_aces, "midi_test_output.wav")
