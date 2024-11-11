@@ -1,4 +1,4 @@
 mido
 requests
 numpy
-soundfile
+soundfile == 0.12.1
