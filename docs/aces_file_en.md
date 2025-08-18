@@ -8,6 +8,7 @@
 | notes        | Array      | Yes      | Note sequence, see `note` object                                            |
 | piece_params | Object     | No       | See `piece_params` object                                                   |
 | pad          | Object     | No       | Pad notes at the beginning and end of the current segment, see `pad` object |
+| random_seed  | number     | No       | Random seed number, used for random fine-tuning of timbre                   |
 
 *Example:*
 

@@ -8,6 +8,7 @@
 | notes        | Array  | 是    | 音符序列，详见 `note` 对象      |
 | piece_params | Object | 否    | 见 `piece_params` 对象    |
 | pad          | Object | 否    | 当前片段头尾pad音符，见 `pad` 对象 |
+| random_seed  | number | 否    | 随机种子数，用来对音色进行随机微调      |
 
 *示例：*
 
