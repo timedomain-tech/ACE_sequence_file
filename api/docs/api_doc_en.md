@@ -108,7 +108,7 @@ Data format explanation:
 ### 2. Quota statistics
 
 - Request：`https://gateway-us.svsbusiness.com/bill/quota`
-- Request Method：`POST`
+- Request Method：`GET`
 
 #### Request Parameters
 

@@ -108,7 +108,7 @@ data格式说明：
 ### 2. 调用额度统计
 
 - 请求地址：`https://gateway.svsbusiness.com/bill/quota`
-- 请求方式：`POST`
+- 请求方式：`GET`
 
 #### 请求参数说明
 

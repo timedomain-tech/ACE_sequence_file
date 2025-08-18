@@ -789,5 +789,6 @@
       "envelope": [],
       "user": []
     }
-  }
+  },
+  "random_seed": 0
 }
