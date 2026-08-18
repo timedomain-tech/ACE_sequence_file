@@ -27,7 +27,7 @@
 | extra          | string | No       | Users can input any string, which will be filled into the returned data structure                                                       |
 | file           | file   | Yes      | The ACES file itself; the multipart field name must be `file`. Repeat the field to submit several pieces in one request                  |
 
-**Note**: Each request file must have a synthesis duration shorter than 18 seconds, and the number of uploaded files should not exceed 10.
+**Note**: Each request file must have a synthesis duration of at most 90 seconds, and the number of uploaded files should not exceed 3.
 
 #### Voice Blending Feature Explanation
 
@@ -190,9 +190,14 @@ Data format explanation:
 - `charging_strategy = 2` (time-package): credits are not decremented per call; only
   `charging_expire_time` is checked, after which the endpoint returns 400.
 
-We therefore **recommend batching several pieces into one request** (see the piece limit in
-"4. Synthesis Constraints") to reduce credit consumption proportionally. The trade-off is that a
-single failing piece requires retrying the whole request.
+There are therefore two ways to reduce credit consumption, in order of importance:
+
+1. **First, fit the content into as few files as possible.** The per-file limit is 90 seconds
+   (see "4. Synthesis Constraints"). Do not slice content up to satisfy the earlier 18-second
+   limit — the engine infers on a fixed-length canvas, so synthesizing 5 seconds and 90 seconds
+   cost about the same, and slicing only makes the same audio go through inference repeatedly.
+2. **Then batch several files into one request** (up to 3). The trade-off is that a single
+   failing piece requires retrying the whole request.
 
 ```json
 {
@@ -239,7 +244,7 @@ note and the field name so you can locate the problem.
 
 | Constraint                        | Value                          | Description                                                   |
 |-----------------------------------|--------------------------------|---------------------------------------------------------------|
-| Limit on the number of pieces     | 10                             | The number of pieces in each request cannot exceed this limit |
-| Limit on the length of each piece | 18s                            | The length of each piece cannot exceed this time limit        |
+| Limit on the number of pieces     | 3                              | The number of pieces in each request cannot exceed this limit |
+| Limit on the length of each piece | 90s                            | Measured as the notes time span; a 1200-phoneme cap also applies, see [ACES file specification](/docs/aces_file_en.md) 5.8 |
 | Concurrent request limit          | 20                             | **Node-level** cap shared by all customers; the gateway returns 503 beyond it — back off and retry |
 | Queries per second per token      | 3 by default, contact us to adjust | Enforced as an average over a **60-second rolling window** (rejected when requests in the window exceed qps x 60); returns 400 |

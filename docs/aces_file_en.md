@@ -295,15 +295,27 @@ To break the sound after a sustained note, place the `sp` / `br` **after** the `
 > the engine inserts the silence; see 5.11 for the limit.
 ### 5.7 `consonant_time_head` / `consonant_time_tail` are no longer used by the current engine
 Supplying them causes no error but has no effect; consonant durations are decided by the model.
-### 5.8 Each aces file can only synthesize a notes list of no more than 18 seconds
-Measured as the actual time span of the notes (largest `end_time` minus smallest `start_time`).
+### 5.8 Each aces file can only synthesize a notes list of no more than 90 seconds
+Measured as the actual time span of the notes (largest `end_time` minus smallest `start_time`);
+exceeding it returns `400`.
+
+> The per-piece limit has been raised from the earlier 18s to 90s. The engine infers on a
+> fixed-length canvas, so synthesizing 5 seconds and 90 seconds cost about the same compute —
+> there is **no need to slice long passages into 18s fragments** any more, as that only makes
+> the same audio go through inference repeatedly. Prefer one file per complete passage.
+>
+> The other limit is a **total of 1200 phonemes** (summed over the notes, with breath notes and
+> engine-inserted silences counting as 1 each). Very dense material (fast rap, for example) can
+> hit this before reaching 90s; that returns `453` and reports the phoneme total.
 ### 5.9 Speaker information must be provided
 Supply it via the `speaker_id` or `mix_info` request parameter; the singer must be in the singer list.
 ### 5.10 If you want to use piece_params field, you need to carefully check that the time range of piece_params cannot exceed the time range of the note list
 Parts outside the range are clipped automatically without an error.
-### 5.11 Silence between notes should not exceed 10s
-Exceeding it returns `453`. If a song contains long gaps, split it into several pieces and
-request them separately.
+### 5.11 Silence between notes
+Long silences inside a piece are fine (an intro rest or an instrumental section can simply be
+left empty) as long as the whole span stays within the 90s limit of 5.8 — there is no need to
+split a piece just to skip over a gap. Ordinary notes do not need an explicit `sp` between
+them; leave a time gap and the engine fills in the silence.
 
 ### 5.12 Notes must not overlap in time
 The service first sorts the notes by `start_time`, then requires every adjacent pair to satisfy
