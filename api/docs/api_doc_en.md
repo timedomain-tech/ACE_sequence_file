@@ -102,7 +102,12 @@ Data format explanation:
 | output_format_suffix | string | Audio file suffix, `ogg` by default                                                              |
 | sequence_index       | number | Index of the corresponding uploaded file, starting at 0, matching the order of the `file` fields  |
 
-**Audio format**: Ogg/Opus container by default, 44.1kHz, about 64kbps.
+**Audio format**: Ogg/Opus container by default, **48kHz**, VBR targeting 64kbps
+(measured around 70kbps on long pieces).
+
+> The engine synthesizes internally at 44.1kHz, but Opus only supports 48kHz natively, so the
+> encoder resamples to 48kHz — the file you download has a sample rate of 48000. Resample on
+> your side if you need 44.1kHz material.
 
 **The download URL is valid for 48 hours** (172800 seconds); fetch and store the audio within that
 window. The service does **not** cache synthesis results — resubmitting the same request
