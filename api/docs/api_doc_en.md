@@ -27,7 +27,7 @@
 | extra          | string | No       | Users can input any string, which will be filled into the returned data structure                                                       |
 | file           | file   | Yes      | The ACES file itself; the multipart field name must be `file`. Repeat the field to submit several pieces in one request                  |
 
-**Note**: Each request file must have a synthesis duration shorter than 18 seconds, and the number of uploaded files should not exceed 4.
+**Note**: Each request file must have a synthesis duration shorter than 18 seconds, and the number of uploaded files should not exceed 10.
 
 #### Voice Blending Feature Explanation
 
@@ -43,20 +43,22 @@ For example, to sound 70% like singer 82 and 30% like singer 1:
 }
 ```
 
-> **Important change (current engine version)**
+> **`mel` is the only blending dimension.**
 >
 > Earlier versions let you set a different blending ratio for each of the 7 dimensions
 > `duration` / `pitch` / `air` / `falsetto` / `tension` / `energy` / `mel`. The current engine
-> uses a single unified timbre representation, so **only the `mel` dimension takes effect**;
-> the other six have no differentiated effect even if supplied.
+> uses a single unified timbre representation with only one voice vector, so **only `mel`
+> is kept**; supplying any of the other six returns `400`.
 >
-> - For backward compatibility, supplying all 7 dimensions **does not raise an error**: the
->   service uses `mel` (falling back to `pitch`, then `duration`, if absent) as the actual ratio.
+> Why an error rather than silently ignoring it: silence would hand you a `200` and audio
+> with the wrong timbre, with no way to tell from the response what went wrong.
+>
 > - If you only need a single singer, just use the `speaker_id` parameter — no `mix_info` needed.
->
-> The original meaning of each dimension (useful for understanding singer characteristics):
-> `duration` articulation, `pitch` singing style, `air` breathiness, `falsetto` falsetto amount,
-> `tension` vocal cord tension, `energy` intensity, `mel` basic timbre.
+> - To control **how much** breath / falsetto / tension / intensity the voice has, use the
+>   `air` / `falsetto` / `tension` / `energy` curves in `piece_params` inside the ACES file
+>   (see [ACES file specification](/docs/aces_file_en.md), section 3). Note this is not the
+>   same as "borrowing another singer's characteristic in that dimension" — the former draws
+>   a 0~1 intensity curve, the latter is not supported by the current engine.
 
 #### Request Example
 
@@ -237,7 +239,7 @@ note and the field name so you can locate the problem.
 
 | Constraint                        | Value                          | Description                                                   |
 |-----------------------------------|--------------------------------|---------------------------------------------------------------|
-| Limit on the number of pieces     | 4                              | The number of pieces in each request cannot exceed this limit |
+| Limit on the number of pieces     | 10                             | The number of pieces in each request cannot exceed this limit |
 | Limit on the length of each piece | 18s                            | The length of each piece cannot exceed this time limit        |
 | Concurrent request limit          | 20                             | **Node-level** cap shared by all customers; the gateway returns 503 beyond it — back off and retry |
 | Queries per second per token      | 3 by default, contact us to adjust | Enforced as an average over a **60-second rolling window** (rejected when requests in the window exceed qps x 60); returns 400 |

@@ -101,9 +101,9 @@ phonemes automatically, so `phone` is not required.
 | falsetto   | Object     | No       | See `param` object, falsetto amount      |
 | tension    | Object     | No       | See `param` object, vocal cord tension   |
 
-> Effective on the current engine: the `user` / `delta` layers of `pitch`, and the
-> `user` layer of `energy` / `air` / `falsetto` / `tension`.
-> Other layers (such as `envelope`) are ignored, see 3.2.
+> Effective layers: the `user` / `delta` layers of `pitch`, and the `user` layer of
+> `energy` / `air` / `falsetto` / `tension`. These five parameters and these layers are
+> all there is — other layers (such as `envelope`) return `400` if supplied, see 3.2.
 
 Ready-to-submit examples:
 
@@ -153,13 +153,18 @@ Example:
 
 ### 3.2 PARAM: Parameter Representation
 
-| Field Name | Field Type          | Required | Description                                                                             |
-|------------|---------------------|----------|-----------------------------------------------------------------------------------------|
-| user       | Array(PIECE_VALUE) | No       | Custom parameter curve, see `piece_value` object, value range depends on parameter type |
-| envelope   | Array(PIECE_VALUE) | No       | Parameter envelope curve. **No longer supported by the current engine; ignored if supplied** |
+| Field Name | Field Type         | Required | Description                                                    |
+|------------|--------------------|----------|----------------------------------------------------------------|
+| user       | Array(PIECE_VALUE) | No       | Custom parameter curve, see `piece_value` object, range 0~1 |
 
-Value ranges of the `user` layer: 0~5.2 for `energy`, 0~1 for `air` / `falsetto` / `tension`.
-A negative value means "unspecified here, let the model predict it".
+**All four parameters use the same `user` range, 0~1.** A negative value means
+"unspecified here, let the model predict it". Values outside 0~1 are clamped, not rejected.
+
+> **The `envelope` layer is no longer supported and returns `400` if supplied**
+> (rather than being silently ignored — silence would hand you a `200` and audio without
+> the dynamics you drew). `envelope` used to mean "multiply the model's predicted value",
+> and the caller cannot see that predicted value, nor can the server convert the envelope
+> into an equivalent absolute curve. Use the `user` layer with absolute 0~1 values instead.
 
 What the four parameters do perceptually: `energy` is loudness and intensity; `air` is
 the amount of breath; `falsetto` is the falsetto ratio (it weakens the upper harmonics,
@@ -174,8 +179,7 @@ Example:
 
 ```
 {
-    "user": [PIECE_VALUE],
-    "envelope": [PIECE_VALUE]
+    "user": [PIECE_VALUE]
 }
 ```
 
@@ -263,9 +267,10 @@ can hold at most 2 phonemes; a third one returns `453` together with the timesta
 As a rule of thumb, keep each note at least 0.05s long.
 
 ### 5.2 Pitch must be in the range of 30 to 90
-This is the **recommended musical range** (440Hz reference = 69). The hard validation range is
-`[1, 99]`; values outside the hard range return `453`. Values between the hard range and the
-recommended range are accepted without error but usually sound unusable.
+440Hz reference = 69. **This is the hard validation range**; values outside it return `453`
+together with the offending note time. Out-of-range pitches are treated as an invalid
+fundamental frequency inside the engine (you would hear silence or artefacts), so they are
+rejected up front rather than passed through into unusable audio.
 ### 5.3 The language field supports ch / en / jp / spa, and also ko / fr / it / pt
 Any other value returns `400`.
 ### 5.4 Each note's phone must be legal, and the list of legal phones varies for different languages

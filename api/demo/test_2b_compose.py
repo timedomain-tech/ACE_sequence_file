@@ -12,7 +12,8 @@ ACE_TOEKN = "xxxxx"
 FLAG = "xxxx"
 
 
-# 声线混合: 只有 mel 维度会生效, 权重会自动归一化。详见 api_doc 的说明。
+# 声线混合: mel 是唯一的混合维度, 权重自动归一化。
+# 传 duration/pitch/air/falsetto/tension/energy 会返回 400, 详见 api_doc 的说明。
 # mix_str = json.dumps({
 #     "mel": [[82, 0.7], [1, 0.3]],
 # })

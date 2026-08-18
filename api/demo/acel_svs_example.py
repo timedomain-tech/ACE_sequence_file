@@ -26,13 +26,9 @@ def download_and_open_audio(url):
 
 def one_piece_compose(aces_json):
 
+    # 声线混合: mel 是唯一的混合维度, 权重自动归一化。
+    # 传 duration/pitch/air/falsetto/tension/energy 会返回 400, 详见 api_doc。
     # mix_str = json.dumps({
-    #     "duration": [[82, 0.7], [1, 0.3]],
-    #     "pitch": [[82, 0.7], [1, 0.3]],
-    #     "air": [[82, 0.7], [1, 0.3]],
-    #     "falsetto": [[82, 0.7], [1, 0.3]],
-    #     "tension": [[82, 0.7], [1, 0.3]],
-    #     "energy": [[82, 0.7], [1, 0.3]],
     #     "mel": [[82, 0.7], [1, 0.3]],
     # })
 
