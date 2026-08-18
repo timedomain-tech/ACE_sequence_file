@@ -28,8 +28,8 @@
 | start_time | number | 是              | 音符开始时间，以秒为单位              |
 | end_time   | number | 是              | 音符结束时间，以秒为单位              |
 | type       | string | 否，默认为"general" | 音符类型，详见音符类型说明             |
-| pitch      | number | 否              | 音高值，详见音高值说明               |
-| language   | string | 否，默认为ch        | 音符语言：中文"ch"，英语"en"，日语"jp" |
+| pitch      | number | type 为 general 时必传 | 音高值，详见音高值说明。`slur` 可省略（继承前一个发音音符的音高）；`br`/`sp` 忽略该字段 |
+| language   | string | 否，默认为ch        | 音符语言，取值见 5.3（`ch`/`en`/`jp`/`spa`，另支持 `ko`/`fr`/`it`/`pt`） |
 | phone      | Array  | 否              | 当前note音素列表，详见音素说明         |
 | syllable   | string | 否              | 当前note音节，详见音节说明           |
 
@@ -52,7 +52,12 @@
 
 ### 2.4 音节说明
 
-语言为中文或者日语时才可以使用，可以直接使用音节而无需传音素列表
+**仅中文（`language` 为 `ch`）支持音节输入**，可以直接给拼音（如 `"la"`、`"shan"`）
+或单个汉字（如 `"星"`），服务会自动转换成音素，无需传 `phone`。
+
+- 汉字为多音字、或拼音不合法时会返回 `400`，请改用拼音或直接给 `phone`。
+- **其它语言（英语/日语/西班牙语等）请直接给 `phone` 列表**。这些语言不做音节转换，
+  只传 `syllable` 会得到一个默认发音（不是您期望的歌词）。
 
 *示例：*
 
@@ -84,10 +89,17 @@
 
 ## 3. PIECE_PARAMS: 片段参数(实验性功能)
 
-| 字段名    | 字段类型   | 是否必传 | 说明            |
-|--------|--------|------|---------------|
-| pitch  | Object | 否    | 详见 `pitch` 对象 |
-| energy | Object | 否    | 详见 `param` 对象 |
+| 字段名      | 字段类型   | 是否必传 | 说明            |
+|----------|--------|------|---------------|
+| pitch    | Object | 否    | 详见 `pitch` 对象 |
+| energy   | Object | 否    | 详见 `param` 对象 |
+| air      | Object | 否    | 详见 `param` 对象，气息含量 |
+| falsetto | Object | 否    | 详见 `param` 对象，假声含量 |
+| tension  | Object | 否    | 详见 `param` 对象，声带紧张度 |
+
+> 当前引擎生效范围：`pitch` 的 `user` / `delta` 层，以及
+> `energy` / `air` / `falsetto` / `tension` 的 `user` 层。
+> 其余层（如 `envelope`）会被忽略，见 3.2。
 
 ### 3.1 PITCH: 音高表示
 
@@ -95,6 +107,10 @@
 |-------|--------------------|------|-------------------------------------------|
 | user  | Array(PIECE_VALUE) | 否    | 用户自定义音高线, 见 `piece_value` 对象，取值范围30-90    |
 | delta | Array(PIECE_VALUE) | 否    | 用户自定义音高线偏移, 见 `piece_value` 对象，取值范围[-4,4] |
+
+> **`delta` 必须与 `user` 同时给出。** `delta` 是叠加在 `user` 音高线之上的修正量，
+> 只给 `delta` 而不给 `user` 时该层会被忽略（不会报错，但颤音等效果不会生效）。
+> 未被 `user` 覆盖的时间段由模型自行预测音高。
 
 示例：
 
@@ -110,7 +126,10 @@
 | 字段名      | 字段类型                | 是否必传 | 说明                                       |
 |----------|---------------------|------|------------------------------------------|
 | user     | Array(PIECE_VALUE)  | 否    | 自定义参数线, 见 `piece_value` 对象， 取值范围根据参数类型决定 |
-| envelope | Array(PIECE_VALUE)  | 否    | 参数包络线, 见 `piece_value` 对象，取值范围0-2        |
+| envelope | Array(PIECE_VALUE)  | 否    | 参数包络线，**当前引擎已不支持，传入会被忽略**                |
+
+`user` 层的取值范围：`energy` 为 0~5.2，`air` / `falsetto` / `tension` 为 0~1。
+数组中的负值表示"该处不指定，交给模型预测"。
 
 示例：
 
@@ -168,6 +187,11 @@
 说明：  
 pad属于额外信息，一般情况下可不填。当ACES文件用于深度学习模型合成歌声时，可以加入此片段外前后的音符信息，用来获得更佳的合成效果
 
+> **当前引擎的实际行为**：`pad` 完全可以不传 —— 服务会根据 notes 的首尾时间自动补齐，
+> 并按内部帧栅格对齐。若传了 `pad`，其中的 `type`（`sp` / `br` / `sil` 等）会被采用，
+> 但 `start_time` / `end_time` 会被重新计算。
+> 部分早期客户端使用 `pad_notes` 作为字段名，同样被接受。
+
 示例：
 
 ```
@@ -181,13 +205,50 @@ pad属于额外信息，一般情况下可不填。当ACES文件用于深度学�
 *定义：*
 每个note只有唯一的元音，本note内该元音之前的辅音都称为pre_consonant，本note内该元音之后的辅音都称为post_consonant
 
-### 5.1 每个note必须有足够的长度，小于0.02s的note会有很大概率发生合成异常
+### 5.1 每个note必须有足够的长度容纳它的音素
+音素时长的最小单位是一帧（约 5.8ms）。**一个 note 的音素个数不能超过它的时长所对应的帧数**，
+例如 16ms 的 note（约 2 帧）最多只能有 2 个音素，塞 3 个会返回 `453` 并指出该音符的时间。
+一般建议每个 note 不短于 0.05s。
+
 ### 5.2 pitch必须在30到90的区间
-### 5.3 language字段只支持ch\en\jp\spa
+这是**建议的音乐可用区间**（440Hz 标准音 = 69）。服务的硬校验区间是 `[1, 99]`，
+超出硬区间返回 `453`；在 30~90 之外但仍在硬区间内不会报错，但音质通常不可用。
+### 5.3 language字段支持 ch / en / jp / spa，另外也支持 ko / fr / it / pt
+不在列表内的取值会返回 `400`。
 ### 5.4 每个note的每个phone是必须是合法的，不同语言的合法phone列表是不一样的
+音素表见 https://github.com/timedomain-tech/ACE_phonemes 。
+表外的音素会返回 `453` 并列出无法识别的音素名。
 ### 5.5 每个note必须正好有一个元音
-### 5.6 如果要调节consonant_time_head或者consonant_time_tail需要认真核对：本note中的pre_consonant数量与consonant_time_head中元素数量相等；本note中的post_consonant数量与consonant_time_tail中元素数量相等
-### 5.7 由于内部逻辑，我们会将每个note的post_consonant与下一个note的pre_consonant合并计算，因此需要保证：本note的长度>本note的consonant_time_tail长度+下一个note的consonant_time_head长度
+没有元音的 note 会返回 `453`（否则该字会不发音）。
+### 5.6 `slur`（延音）必须与它所延长的音符严格首尾相接
+`slur.start_time` 必须等于前一个发音音符（`general` 或 `slur`）的 `end_time`（容差 1ms），
+两者之间**不能留空隙，也不能插入任何音符**：
+
+- 留空隙 → `400`，提示 `slur starts <x>s after the previous note ends`
+- 中间插 `sp` / `sil` → 同样是上面这个 `400`（`sp` 会被服务端剔除，等价于留空隙）
+- 中间插 `br` → `400`，提示 `slur must follow a general/slur note`
+- `slur` 也不能是 notes 里的第一个音符 → `400` `first note can not be slur`
+
+需要在拖腔之后断开，请把 `sp` / `br` 放在 `slur` **结束之后**，例如
+`general[0,1] + slur[1,2] + br[2,2.5]`。
+
+> 普通（非 slur）音符之间不需要显式 `sp`，直接留时间空隙即可，引擎会自动补静音，上限见 5.11。
+### 5.7 `consonant_time_head` / `consonant_time_tail` 当前引擎已不再使用
+传入不会报错，但不会产生效果，辅音时长由模型自行决定。
 ### 5.8 每个aces文件只能合成不大于18s的notes列表
+按 notes 的实际时间跨度（最大 `end_time` 减最小 `start_time`）计算。
 ### 5.9 必须提供speaker信息
+通过接口的 `speaker_id` 或 `mix_info` 参数提供，歌手需在歌手列表内。
 ### 5.10 如果要使用piece_params，需要认真核对piece_params的时间范围不能超过note列表的时间范围
+超出范围的部分会被自动裁掉，不会报错。
+### 5.11 音符之间的静音间隔不应超过10s
+超过会返回 `453`。若整首歌有长间隔，请拆成多个片段分别请求。
+
+### 5.12 音符之间不能时间重叠
+服务会先把 notes 按 `start_time` 排序，再要求相邻音符满足
+`后一个的 start_time >= 前一个的 end_time`。重叠返回 `453`，并给出具体时间，例如
+`note at 0.8000s overlaps the previous note ending at 1.0000s`。
+该规则对 `general` / `slur` / `br` 一律生效（`sp` / `sil` 已被提前剔除，不参与）。
+notes 数组本身**不要求**按时间排序。
+
+> 从 MIDI / DAW 导出时请注意关闭 legato、检查叠轨，这是该错误最常见的来源。

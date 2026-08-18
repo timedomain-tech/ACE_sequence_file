@@ -28,8 +28,8 @@
 | start_time | number     | Yes                      | Note start time, in seconds                                    |
 | end_time   | number     | Yes                      | Note end time, in seconds                                      |
 | type       | string     | No, default is "general" | Note type, see Note Type Description                           |
-| pitch      | number     | No                       | Pitch value, see Pitch Value Description                       |
-| language   | string     | No, default is "ch"      | Note language: Chinese "ch", English "en", Japanese "jp"       |
+| pitch      | number     | Required when type is "general" | Pitch value, see Pitch Value Description. Optional for "slur" (inherits the pitch of the note it extends); ignored for "br"/"sp" |
+| language   | string     | No, defaults to ch | Note language, see 5.3 (`ch`/`en`/`jp`/`spa`, plus `ko`/`fr`/`it`/`pt`) |
 | phone      | Array      | No                       | List of phonemes for the current note, see Phoneme Description |
 | syllable   | string     | No                       | Syllable for the current note, see Syllable Description        |
 
@@ -53,7 +53,15 @@ to: https://github.com/timedomain-tech/ACE_phonemes
 
 ### 2.4 Syllable Description
 
-Only can be used when language is Chinese or Japanese, syllable can be used instead of phoneme lists
+**Only Chinese (`language` = `ch`) supports syllable input.** You may give either pinyin
+(e.g. `"la"`, `"shan"`) or a single Chinese character (e.g. `"星"`); the service converts it to
+phonemes automatically, so `phone` is not required.
+
+- If the character has multiple readings, or the pinyin is invalid, `400` is returned — use
+  pinyin or supply `phone` directly instead.
+- **For other languages (English / Japanese / Spanish etc.) please supply the `phone` list.**
+  These languages have no syllable conversion; supplying only `syllable` yields a default
+  pronunciation rather than your intended lyric.
 
 *Example:*
 
@@ -85,10 +93,17 @@ Only can be used when language is Chinese or Japanese, syllable can be used inst
 
 ## 3. PIECE_PARAMS: Segment Parameters (Experimental Feature)
 
-| Field Name | Field Type | Required | Description        |
-|------------|------------|----------|--------------------|
-| pitch      | Object     | No       | See `pitch` object |
-| energy     | Object     | No       | See `param` object |
+| Field Name | Field Type | Required | Description                              |
+|------------|------------|----------|------------------------------------------|
+| pitch      | Object     | No       | See `pitch` object                       |
+| energy     | Object     | No       | See `param` object                       |
+| air        | Object     | No       | See `param` object, breathiness          |
+| falsetto   | Object     | No       | See `param` object, falsetto amount      |
+| tension    | Object     | No       | See `param` object, vocal cord tension   |
+
+> Effective on the current engine: the `user` / `delta` layers of `pitch`, and the
+> `user` layer of `energy` / `air` / `falsetto` / `tension`.
+> Other layers (such as `envelope`) are ignored, see 3.2.
 
 ### 3.1 PITCH: Pitch Representation
 
@@ -96,6 +111,11 @@ Only can be used when language is Chinese or Japanese, syllable can be used inst
 |------------|--------------------|----------|------------------------------------------------------------------------|
 | user       | Array(PIECE_VALUE) | No       | User-defined pitch curve, see `piece_value` object, value range 30-90  |
 | delta      | Array(PIECE_VALUE) | No       | User-defined pitch shift, see `piece_value` object, value range [-4,4] |
+
+> **`delta` must be supplied together with `user`.** `delta` is an offset applied on top
+> of the `user` pitch curve; if you supply `delta` without `user`, that layer is ignored
+> (no error is returned, but effects such as vibrato will not take effect).
+> Time ranges not covered by `user` are predicted by the model.
 
 Example:
 
@@ -111,7 +131,10 @@ Example:
 | Field Name | Field Type          | Required | Description                                                                             |
 |------------|---------------------|----------|-----------------------------------------------------------------------------------------|
 | user       | Array(PIECE_VALUE) | No       | Custom parameter curve, see `piece_value` object, value range depends on parameter type |
-| envelope   | Array(PIECE_VALUE) | No       | Parameter envelope curve, see `piece_value` object, value range 0-2                     |
+| envelope   | Array(PIECE_VALUE) | No       | Parameter envelope curve. **No longer supported by the current engine; ignored if supplied** |
+
+Value ranges of the `user` layer: 0~5.2 for `energy`, 0~1 for `air` / `falsetto` / `tension`.
+A negative value means "unspecified here, let the model predict it".
 
 Example:
 
@@ -170,6 +193,11 @@ Description:
 PAD is additional information that is usually not required. When the ACES file is used for deep learning model synthesis
 of singing voices, the note information before and after this segment can be added to obtain better synthesis results.
 
+> **Actual behaviour of the current engine**: `pad` can be omitted entirely — the service fills it
+> in from the first/last note times and aligns it to the internal frame grid. If you do supply
+> `pad`, its `type` (`sp` / `br` / `sil` etc.) is honoured, but `start_time` / `end_time` are
+> recomputed. Some earlier clients use `pad_notes` as the field name; that is accepted as well.
+
 Example:
 
 ```
@@ -183,13 +211,56 @@ Example:
 *definition：*
 Each note has only a unique vowel, and the consonants before the vowel in this note are called pre consonants. The consonants after the vowel in this note are called post consonants
 
-### 5.1 Each note must have sufficient length, notes less than 0.02s have a high probability of experiencing synthesis anomalies
+### 5.1 Each note must be long enough to hold its phonemes
+The minimum unit of phoneme duration is one frame (about 5.8ms). **The number of phonemes in a
+note must not exceed the number of frames its duration spans** — e.g. a 16ms note (about 2 frames)
+can hold at most 2 phonemes; a third one returns `453` together with the timestamp of that note.
+As a rule of thumb, keep each note at least 0.05s long.
+
 ### 5.2 Pitch must be in the range of 30 to 90
-### 5.3 The language field only supports ch \ en \ jp \ spa
+This is the **recommended musical range** (440Hz reference = 69). The hard validation range is
+`[1, 99]`; values outside the hard range return `453`. Values between the hard range and the
+recommended range are accepted without error but usually sound unusable.
+### 5.3 The language field supports ch / en / jp / spa, and also ko / fr / it / pt
+Any other value returns `400`.
 ### 5.4 Each note's phone must be legal, and the list of legal phones varies for different languages
+See https://github.com/timedomain-tech/ACE_phonemes . Phonemes outside the table return `453`
+together with the unrecognised phoneme names.
 ### 5.5 Each note must have exactly one vowel
-### 5.6 If you want to adjust consonant_time_head or consonant_time_tail, you need to carefully check: the number of pre consonants in this note is equal to the number of elements in consonant_time_head; The number of post_consonants in this note is equal to the number of elements in consonant_time_tail
-### 5.7 Due to internal logic, we will merge the post_consonant of each note with the pre_consonant of the next note for calculation. Therefore, we need to ensure that the length of this note is greater than the consonant_time_tail length of this note plus the consonant_time_head length of the next note
+A note without a vowel returns `453` (otherwise that syllable would be silent).
+### 5.6 A `slur` must be exactly adjacent to the note it extends
+`slur.start_time` must equal the `end_time` of the preceding sounding note (`general` or `slur`),
+with a 1ms tolerance. **No gap may be left and no note may be inserted in between**:
+
+- Leaving a gap returns `400`: `slur starts <x>s after the previous note ends`
+- Inserting `sp` / `sil` returns the same `400` (`sp` is stripped by the server, which is
+  equivalent to leaving a gap)
+- Inserting `br` returns `400`: `slur must follow a general/slur note`
+- A `slur` also cannot be the first note in `notes` → `400` `first note can not be slur`
+
+To break the sound after a sustained note, place the `sp` / `br` **after** the `slur` ends, e.g.
+`general[0,1] + slur[1,2] + br[2,2.5]`.
+
+> Between ordinary (non-slur) notes you do not need an explicit `sp` — just leave a time gap and
+> the engine inserts the silence; see 5.11 for the limit.
+### 5.7 `consonant_time_head` / `consonant_time_tail` are no longer used by the current engine
+Supplying them causes no error but has no effect; consonant durations are decided by the model.
 ### 5.8 Each aces file can only synthesize a notes list of no more than 18 seconds
+Measured as the actual time span of the notes (largest `end_time` minus smallest `start_time`).
 ### 5.9 Speaker information must be provided
+Supply it via the `speaker_id` or `mix_info` request parameter; the singer must be in the singer list.
 ### 5.10 If you want to use piece_params field, you need to carefully check that the time range of piece_params cannot exceed the time range of the note list
+Parts outside the range are clipped automatically without an error.
+### 5.11 Silence between notes should not exceed 10s
+Exceeding it returns `453`. If a song contains long gaps, split it into several pieces and
+request them separately.
+
+### 5.12 Notes must not overlap in time
+The service first sorts the notes by `start_time`, then requires every adjacent pair to satisfy
+`start_time of the later note >= end_time of the earlier note`. An overlap returns `453` with the
+exact position, e.g. `note at 0.8000s overlaps the previous note ending at 1.0000s`.
+The rule applies to `general` / `slur` / `br` alike (`sp` / `sil` are stripped beforehand and do
+not participate). The notes array itself does **not** need to be sorted by time.
+
+> When exporting from MIDI or a DAW, turn off legato and check for stacked tracks — that is by
+> far the most common cause of this error.

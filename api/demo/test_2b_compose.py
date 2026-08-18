@@ -1,4 +1,5 @@
 import json
+import os
 
 import requests
 
@@ -11,17 +12,14 @@ ACE_TOEKN = "xxxxx"
 FLAG = "xxxx"
 
 
+# 声线混合: 只有 mel 维度会生效, 权重会自动归一化。详见 api_doc 的说明。
 # mix_str = json.dumps({
-#     "duration": [[82, 0.7], [1, 0.3]],
-#     "pitch": [[82, 0.7], [1, 0.3]],
-#     "air": [[82, 0.7], [1, 0.3]],
-#     "falsetto": [[82, 0.7], [1, 0.3]],
-#     "tension": [[82, 0.7], [1, 0.3]],
-#     "energy": [[82, 0.7], [1, 0.3]],
 #     "mel": [[82, 0.7], [1, 0.3]],
 # })
 
-file_url = "examples/Iwannafly.aces"
+# 按脚本自身位置定位样例文件, 这样在任意工作目录下都能运行
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+file_url = os.path.join(REPO_ROOT, "examples", "Iwannafly.aces")
 files = [('file', open(file_url, 'rb'))]
 
 ace_token = ACE_TOEKN

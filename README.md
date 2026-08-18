@@ -29,4 +29,4 @@ We offer an API service for singing voice synthesis, please refer to the [api_do
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENCE](LICENCE) file for details.
