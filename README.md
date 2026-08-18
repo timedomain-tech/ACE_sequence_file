@@ -17,7 +17,20 @@ Aces is a file format specifically designed for vocal synthesis that is simple, 
 
 
 ## File Format Specification
-For specifics regarding the file format please refer to  [File Description](docs/aces_file_en.md). Examples illustrating various use-cases can be found in the `./examples/` directory.
+For specifics regarding the file format please refer to  [File Description](docs/aces_file_en.md). Every example under `./examples/` can be submitted to the synthesis API as-is:
+
+| File                          | What it demonstrates                                                     |
+|-------------------------------|--------------------------------------------------------------------------|
+| `xiaoxingxing_syllable.aces`  | The simplest form: Chinese syllable (pinyin) input, no phonemes needed    |
+| `xiaoxingxing.aces`           | Chinese phoneme input, with multi-segment `pitch.user` editing the melody |
+| `Iwannafly.aces`              | English phoneme input, including `br` (breath) and `slur` notes           |
+| `はるをあい cl するひと_2b.aces`       | Japanese phoneme input                                                   |
+| `vibrato_example.aces`        | Controlled vibrato via the `user` + `delta` layers of `pitch`             |
+| `param_example.aces`          | `energy` / `air` / `falsetto` / `tension` parameter curves                |
+
+> `xiaoxingxing.aces` and the Japanese example still carry legacy `energy.envelope`
+> data, a layer the current engine no longer reads (see File Description 3.2). To
+> control those four parameters, follow `param_example.aces` and use the `user` layer.
 
 ## Contributing
 

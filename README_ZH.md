@@ -17,7 +17,19 @@ Aces 是一个专为歌声合成设计的文件格式，它简单、开放、用
 
 
 ## 文件格式规范
-有关文件格式的具体信息，请参考 [文件描述](docs/aces_file.md)。在 `./examples/` 目录中可以找到各种用例的示例。
+有关文件格式的具体信息，请参考 [文件描述](docs/aces_file.md)。`./examples/` 目录下的示例都可以直接提交给合成接口：
+
+| 文件                            | 演示内容                                            |
+|-------------------------------|-------------------------------------------------|
+| `xiaoxingxing_syllable.aces`  | 最简形态：中文音节（拼音）输入，不必自己查音素                         |
+| `xiaoxingxing.aces`           | 中文音素输入，并用多段 `pitch.user` 编辑整句音高                 |
+| `Iwannafly.aces`              | 英文音素输入，含 `br`（换气）与 `slur`（延音）音符                 |
+| `はるをあい cl するひと_2b.aces`       | 日文音素输入                                          |
+| `vibrato_example.aces`        | 用 `pitch` 的 `user` + `delta` 做可控颤音              |
+| `param_example.aces`          | `energy` / `air` / `falsetto` / `tension` 参数曲线  |
+
+> `xiaoxingxing.aces` 与日文示例中还保留着 `energy.envelope` 的历史数据，当前引擎已不读取
+> 该层（见文件描述 3.2）。要控制这四个参数请参照 `param_example.aces`，写在 `user` 层。
 
 ## 贡献
 

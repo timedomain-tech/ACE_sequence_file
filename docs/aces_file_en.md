@@ -105,6 +105,11 @@ phonemes automatically, so `phone` is not required.
 > `user` layer of `energy` / `air` / `falsetto` / `tension`.
 > Other layers (such as `envelope`) are ignored, see 3.2.
 
+Ready-to-submit examples:
+
+- `examples/vibrato_example.aces` — the `user` + `delta` layers of `pitch` (vibrato)
+- `examples/param_example.aces` — `user` curves for `energy` / `air` / `falsetto` / `tension`
+
 ### 3.1 PITCH: Pitch Representation
 
 | Field Name | Field Type         | Required | Description                                                            |
@@ -116,6 +121,26 @@ phonemes automatically, so `phone` is not required.
 > of the `user` pitch curve; if you supply `delta` without `user`, that layer is ignored
 > (no error is returned, but effects such as vibrato will not take effect).
 > Time ranges not covered by `user` are predicted by the model.
+
+> **Wherever `user` covers, it takes over the pitch completely**; only the uncovered
+> ranges are left to the model. We therefore recommend letting `user` span the whole
+> note: if it only covers the tail where the vibrato sits, the boundary between the
+> model-predicted range and the `user` range produces a pitch step of nearly a
+> semitone (about 100 cents, measured), which is audible as a sudden jump.
+
+> **Sustained notes already carry a model-generated natural vibrato** (measured at
+> roughly 5–6 Hz with a depth of about ±0.5 semitones). You only need to supply
+> `pitch` when you want precise control over when the vibrato starts and over its
+> rate and depth; if you just want "some vibrato", leave `pitch` out. This also
+> means that if you supply
+> `delta` but forget `user`, the vibrato you hear is the model's default behaviour,
+> not the curve you wrote.
+
+`examples/vibrato_example.aces` is a complete example: a single note from 4.75s to
+6.00s, whose `user` layer lays down a flat pitch line at 63 across the whole note
+using 25 points, while `delta` adds a 6 Hz sine starting at 5.29s — so it sounds
+like a straight tone followed by vibrato. To make the effect obvious, that example
+uses a vibrato depth of ±1.8 semitones; real singing is usually within ±0.3~0.7.
 
 Example:
 
@@ -136,6 +161,15 @@ Example:
 Value ranges of the `user` layer: 0~5.2 for `energy`, 0~1 for `air` / `falsetto` / `tension`.
 A negative value means "unspecified here, let the model predict it".
 
+What the four parameters do perceptually: `energy` is loudness and intensity; `air` is
+the amount of breath; `falsetto` is the falsetto ratio (it weakens the upper harmonics,
+making the voice softer); `tension` is vocal cord tension (it raises brightness, and is
+the most pronounced of the four).
+
+`examples/param_example.aces` demonstrates how to write these four curves: four
+sustained notes at the same pitch, each carrying a low-to-high ramp on exactly one
+parameter, so you can audition one parameter at a time.
+
 Example:
 
 ```
@@ -152,6 +186,17 @@ Example:
 | start_time       | number     | Yes      | The actual starting time of the values array                                                   |
 | hop_time         | number     | Yes      | The interval between every two consecutive data frames in the values array                     |
 | values           | Array      | Yes      | An array of values with different ranges depending on the value type                           |
+
+The time range covered by one segment is `start_time` through
+`start_time + len(values) * hop_time`.
+
+> `values` is resampled to the engine's internal frame rate (about one frame every
+> 5.8ms), so `hop_time` is yours to choose: a coarse grid (0.05s, say) is plenty for a
+> slowly varying curve, and there is no need to supply one point per frame. Different
+> layers under the same `piece_params` (for instance the `user` and `delta` layers of
+> `pitch`) are not required to share a `hop_time` either — each layer is aligned to the
+> timeline independently using its own `start_time` / `hop_time`, and the layers are
+> then combined.
 
 Example:
 
