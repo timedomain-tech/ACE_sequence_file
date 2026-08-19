@@ -128,7 +128,9 @@ the submission order via `sequence_index`. If **any single piece fails the whole
 
 ### 2. Quota statistics
 
-- Request：`https://gateway-us.svsbusiness.com/bill/quota`
+- Request URL (not on the same host as the synthesis endpoint — use the one for your node):
+  - China: `https://gateway.svsbusiness.com/bill/quota`
+  - Overseas: `https://gateway-us.svsbusiness.com/bill/quota`
 - Request Method：`GET`
 
 #### Request Parameters
@@ -182,6 +184,10 @@ Data format explanation:
   once it reaches `billing_balance` the synthesis endpoint returns 400.
 - `charging_strategy = 2` (time-package): credits are not decremented per call; only
   `charging_expire_time` is checked, after which the endpoint returns 400.
+
+> **Credits are deducted asynchronously.** After a request returns `200`, `used_amount` takes a
+> few seconds to a few tens of seconds to update. Querying the quota immediately after a request
+> shows the old value; that is normal and does not mean the request was not billed.
 
 There are therefore two ways to reduce credit consumption, in order of importance:
 

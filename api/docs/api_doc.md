@@ -128,7 +128,9 @@ data格式说明：
 
 ### 2. 调用额度统计
 
-- 请求地址：`https://gateway.svsbusiness.com/bill/quota`
+- 请求地址（与合成接口不同源，请使用与您节点对应的那一个）：
+  - 中国：`https://gateway.svsbusiness.com/bill/quota`
+  - 海外：`https://gateway-us.svsbusiness.com/bill/quota`
 - 请求方式：`GET`
 
 #### 请求参数说明
@@ -179,6 +181,9 @@ data格式说明：
 - 返回非 200 的请求**不计费**（400 / 429 / 453 / 503 均不消耗额度）。
 - `charging_strategy = 1`（按量计费）：每次成功请求 `used_amount` 加 1，达到 `billing_balance` 后合成接口返回 400。
 - `charging_strategy = 2`（包时计费）：不按次扣减，只校验 `charging_expire_time`，超期后返回 400。
+
+> **额度是异步扣减的。** 合成请求返回 `200` 后，`used_amount` 需要几秒到十几秒才会更新。
+> 刚提交完就查额度会看到旧值，这是正常的，不代表没有计费。
 
 因此降低额度消耗的做法有两层，按优先级：
 
