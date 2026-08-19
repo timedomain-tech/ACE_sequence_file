@@ -249,6 +249,7 @@ pad属于额外信息，一般情况下可不填。当ACES文件用于深度学�
 每种语言各有一份合法音素表，见 5.4。
 ### 5.4 每个note的每个phone是必须是合法的，不同语言的合法phone列表是不一样的
 音素表见 https://github.com/timedomain-tech/ACE_phonemes 。
+英语 / 日语 / 西班牙语可以用 `api/demo/lyrics2phone.py` 从歌词自动生成音素，见 README。
 表外的音素会返回 `453` 并列出无法识别的音素名。
 ### 5.5 每个note必须正好有一个元音
 没有元音的 note 会返回 `453`（否则该字会不发音）。

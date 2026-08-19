@@ -75,6 +75,42 @@ for piece in body["data"]:
 | `param_example.aces`          | `energy` / `air` / `falsetto` / `tension` 参数曲线  |
 
 
+## 歌词转音素
+
+中文不需要额外工具——直接在音符上写 `syllable`（拼音或单个汉字），服务端会转换。
+**英语 / 日语 / 西班牙语必须自己给 `phone`**，`api/demo/lyrics2phone.py` 就是干这个的：
+
+```bash
+cd api/demo
+pip install -r requirements.txt        # 英语需要 cmudict；日语与西语无依赖
+python lyrics2phone.py en  "twinkle twinkle little star"
+python lyrics2phone.py jp  "さくら さくら"
+python lyrics2phone.py spa "camino de la luz"
+```
+
+输出是逐音符的音素列表，一个音节一个音符，直接填进 `notes` 即可：
+
+```
+[["t","w","ih","ng"], ["k","ah","l"], ["l","ih"], ["t","ah","l"], ["s","t","aa","r"]]
+```
+
+加 `--aces out.aces` 可以直接生成一个可提交的 ACES 骨架（时值与音高是等分占位值，
+请按您的曲谱调整）。
+
+各语言的做法与边界：
+
+| 语言 | 做法 | 主要限制 |
+|----|----|----|
+| 英语 `en` | CMUdict 查词 → ARPAbet → 引擎音素（1:1），按最大起首原则切音节 | 词典查不到的词（新词、专名、数字）会报错而不是猜，需自己用 `extra_dict` 补 |
+| 日语 `jp` | 假名 → 罗马字音节 → 引擎自带词典（内嵌五十音表，无依赖） | 只认假名，汉字请先注音；助词 `は`/`へ` 按字面读 |
+| 西语 `spa` | 正字法规则 → 音素，按重音与强弱元音判定二合元音 | 固定 seseo（`z`/`ce`/`ci` 一律读 `s`），不支持半岛 distinción 与阿根廷读法 |
+
+> **查不到的词一律报错，不按拼写猜。** 猜错的发音客户很难排查，报错至少能立刻定位。
+> 需要自己补词时传 `extra_dict={"word": ["音素", ...]}`。
+>
+> 音素表以引擎为准，工具产出的音素已逐一核对在表内。完整的已知取舍见脚本内的
+> `CAVEATS` 说明。
+
 ## 从 MIDI 生成 aces
 
 `api/demo/midi2aces.py` 能把带歌词的 MIDI 转成 aces 并直接合成。仓库自带 `红昭愿.mid`：

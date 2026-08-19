@@ -269,7 +269,9 @@ rejected up front rather than passed through into unusable audio.
 Chinese, Japanese, English and Spanish respectively. Any other value returns `400`.
 Each language has its own table of legal phonemes, see 5.4.
 ### 5.4 Each note's phone must be legal, and the list of legal phones varies for different languages
-See https://github.com/timedomain-tech/ACE_phonemes . Phonemes outside the table return `453`
+See https://github.com/timedomain-tech/ACE_phonemes . For English, Japanese and Spanish you can
+generate phones from lyrics with `api/demo/lyrics2phone.py`; see the README.
+Phonemes outside the table return `453`
 together with the unrecognised phoneme names.
 ### 5.5 Each note must have exactly one vowel
 A note without a vowel returns `453` (otherwise that syllable would be silent).

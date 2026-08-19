@@ -78,6 +78,44 @@ For specifics regarding the file format please refer to  [File Description](docs
 | `param_example.aces`          | `energy` / `air` / `falsetto` / `tension` parameter curves                |
 
 
+## Lyrics to phonemes
+
+Chinese needs no extra tooling — put the pinyin (or a single Chinese character) in the note's
+`syllable` field and the service converts it. **English, Japanese and Spanish must supply
+`phone` themselves**, which is what `api/demo/lyrics2phone.py` is for:
+
+```bash
+cd api/demo
+pip install -r requirements.txt        # English needs cmudict; Japanese and Spanish have no deps
+python lyrics2phone.py en  "twinkle twinkle little star"
+python lyrics2phone.py jp  "さくら さくら"
+python lyrics2phone.py spa "camino de la luz"
+```
+
+The output is one phone list per note, one syllable per note, ready to drop into `notes`:
+
+```
+[["t","w","ih","ng"], ["k","ah","l"], ["l","ih"], ["t","ah","l"], ["s","t","aa","r"]]
+```
+
+Add `--aces out.aces` to emit a submittable ACES skeleton (with evenly spaced placeholder
+timings and pitches — adjust them to your score).
+
+How each language works, and where it stops:
+
+| Language | Approach | Main limitation |
+|----|----|----|
+| English `en` | CMUdict lookup → ARPAbet → engine phones (1:1), syllabified by maximal onset | Words not in the dictionary (new coinages, proper nouns, numbers) raise an error rather than being guessed; supply them via `extra_dict` |
+| Japanese `jp` | Kana → romaji syllable → the engine's own dictionary (kana table embedded, no dependency) | Kana only — annotate kanji first; the particles `は`/`へ` are read literally |
+| Spanish `spa` | Orthographic rules → phones, with diphthongs decided by stress and vowel strength | Seseo is fixed (`z`/`ce`/`ci` all read as `s`); peninsular distinción and Rioplatense readings are not supported |
+
+> **Unknown words raise an error; nothing is guessed from spelling.** A wrong guess is hard for
+> you to track down, while an error points straight at the word. Supply your own with
+> `extra_dict={"word": ["phone", ...]}`.
+>
+> The phoneme inventory comes from the engine, and every phone the tool emits has been checked
+> against it. The full list of known trade-offs is in the script's `CAVEATS` section.
+
 ## Generating aces from MIDI
 
 `api/demo/midi2aces.py` converts a MIDI file with lyrics into aces and synthesizes it directly.
