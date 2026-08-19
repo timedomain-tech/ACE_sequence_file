@@ -29,7 +29,7 @@
 | end_time   | number     | Yes                      | Note end time, in seconds                                      |
 | type       | string     | No, default is "general" | Note type, see Note Type Description                           |
 | pitch      | number     | Required when type is "general" | Pitch value, see Pitch Value Description. Optional for "slur" (inherits the pitch of the note it extends); ignored for "br"/"sp" |
-| language   | string     | No, defaults to ch | Note language, see 5.3 (`ch`/`en`/`jp`/`spa`, plus `ko`/`fr`/`it`/`pt`) |
+| language   | string     | No, defaults to ch | Note language, see 5.3 (`ch` Chinese / `jp` Japanese / `en` English / `spa` Spanish) |
 | phone      | Array      | No                       | List of phonemes for the current note, see Phoneme Description |
 | syllable   | string     | No                       | Syllable for the current note, see Syllable Description        |
 
@@ -265,8 +265,9 @@ As a rule of thumb, keep each note at least 0.05s long.
 together with the offending note time. Out-of-range pitches are treated as an invalid
 fundamental frequency inside the engine (you would hear silence or artefacts), so they are
 rejected up front rather than passed through into unusable audio.
-### 5.3 The language field supports ch / en / jp / spa, and also ko / fr / it / pt
-Any other value returns `400`.
+### 5.3 The language field supports ch / jp / en / spa
+Chinese, Japanese, English and Spanish respectively. Any other value returns `400`.
+Each language has its own table of legal phonemes, see 5.4.
 ### 5.4 Each note's phone must be legal, and the list of legal phones varies for different languages
 See https://github.com/timedomain-tech/ACE_phonemes . Phonemes outside the table return `453`
 together with the unrecognised phoneme names.

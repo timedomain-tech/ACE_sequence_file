@@ -29,7 +29,7 @@
 | end_time   | number | 是              | 音符结束时间，以秒为单位              |
 | type       | string | 否，默认为"general" | 音符类型，详见音符类型说明             |
 | pitch      | number | type 为 general 时必传 | 音高值，详见音高值说明。`slur` 可省略（继承前一个发音音符的音高）；`br`/`sp` 忽略该字段 |
-| language   | string | 否，默认为ch        | 音符语言，取值见 5.3（`ch`/`en`/`jp`/`spa`，另支持 `ko`/`fr`/`it`/`pt`） |
+| language   | string | 否，默认为ch        | 音符语言，取值见 5.3（`ch` 中文 / `jp` 日语 / `en` 英语 / `spa` 西班牙语） |
 | phone      | Array  | 否              | 当前note音素列表，详见音素说明         |
 | syllable   | string | 否              | 当前note音节，详见音节说明           |
 
@@ -244,8 +244,9 @@ pad属于额外信息，一般情况下可不填。当ACES文件用于深度学�
 440Hz 标准音 = 69。**这是硬校验区间**，超出返回 `453` 并给出具体音符时间。
 区间之外的音高在引擎里会被当作无效基频处理（听感是不发声或怪音），因此在校验层
 直接拒绝，而不是放行后让您拿到一段不可用的音频。
-### 5.3 language字段支持 ch / en / jp / spa，另外也支持 ko / fr / it / pt
-不在列表内的取值会返回 `400`。
+### 5.3 language 字段支持 ch / jp / en / spa
+分别是中文、日语、英语、西班牙语。不在列表内的取值会返回 `400`。
+每种语言各有一份合法音素表，见 5.4。
 ### 5.4 每个note的每个phone是必须是合法的，不同语言的合法phone列表是不一样的
 音素表见 https://github.com/timedomain-tech/ACE_phonemes 。
 表外的音素会返回 `453` 并列出无法识别的音素名。
