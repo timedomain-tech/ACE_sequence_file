@@ -16,6 +16,52 @@ Aces 是一个专为歌声合成设计的文件格式，它简单、开放、用
 - 引入片段参数，允许使用曲线来表示整个片段的音高和能量
 
 
+## 快速开始
+
+四步听到第一句歌声。
+
+### 1. 取得凭据
+
+开通服务后，对接人员会提供两个值：`cooperator`（请求方名称）与 `ace_token`（请求令牌）。
+下面示例中留空，填入即可运行。
+
+### 2. 选一个歌手
+
+歌手 id 见 [歌手信息列表](/api/docs/singer_info.md)。示例用 `82`。
+
+### 3. 准备一个 aces 文件
+
+最省事的办法是直接用 `examples/xiaoxingxing_syllable.aces` —— 中文拼音歌词，不必查音素。
+手里是 MIDI 的话见下面「从 MIDI 生成 aces」。
+
+### 4. 提交并下载音频
+
+```python
+import json, requests
+
+URL = "https://api-lora-us.svsbusiness.com/engine/api/engine/2b_compose"  # 请用对接时分配给您的地址
+COOPERATOR = ""   # 开通后填入
+ACE_TOKEN = ""    # 开通后填入
+
+resp = requests.post(
+    URL,
+    files=[("file", open("examples/xiaoxingxing_syllable.aces", "rb"))],
+    data={"cooperator": COOPERATOR, "ace_token": ACE_TOKEN, "speaker_id": "82"},
+    timeout=300,
+)
+body = resp.json()
+assert body["code"] == 200, body["error"]
+
+for piece in body["data"]:
+    audio = requests.get(piece["audio"], timeout=120).content
+    name = "piece_{}.{}".format(piece["sequence_index"], piece["output_format_suffix"])
+    open(name, "wb").write(audio)
+    print(name, "起始时间", piece["pst"], "秒")
+```
+
+`pst` 是这段音频第 0 个采样点在原工程时间轴上的绝对秒数——按它把音频摆到时间轴上，
+就能与伴奏对齐。接口的完整说明见 [api_doc](/api/docs/api_doc.md)。
+
 ## 文件格式规范
 有关文件格式的具体信息，请参考 [文件描述](docs/aces_file.md)。`./examples/` 目录下的示例都可以直接提交给合成接口：
 
@@ -28,6 +74,34 @@ Aces 是一个专为歌声合成设计的文件格式，它简单、开放、用
 | `vibrato_example.aces`        | 用 `pitch` 的 `user` + `delta` 做可控颤音              |
 | `param_example.aces`          | `energy` / `air` / `falsetto` / `tension` 参数曲线  |
 
+
+## 从 MIDI 生成 aces
+
+`api/demo/midi2aces.py` 能把带歌词的 MIDI 转成 aces 并直接合成。仓库自带 `红昭愿.mid`：
+
+```bash
+cd api/demo
+pip install -r requirements.txt
+python midi2aces.py          # 凭据填在 acel_svs_example.py 里
+```
+
+对 MIDI 的要求：
+
+- 轨道 0 必须含 `set_tempo` 事件，脚本据此把 tick 换算成绝对秒
+- 歌词写在 `lyrics` 元事件里，且**必须是拼音**（脚本按 `syllable` 提交，因此目前只支持中文）
+- 拖腔（一个字唱过多个音）把歌词写成 `-`，脚本会转成 `slur` 音符
+- 歌词事件数量应与音符数一致；没有对应歌词的音符会退化成 `la`
+- 多轨时默认取第一个含音符的轨道，需要指定用 `midi2json(path, json_track_id=N)`
+
+脚本还会替你做三件事：
+
+1. 丢掉短于 0.02s 的音符（太短装不下音素）
+2. 在超过 1.2s 的空隙处切片，仍超过 90s 的片段再对半切
+3. 逐片提交，并按各片的 `pst` 拼成一个完整 wav
+
+以自带的 `红昭愿.mid` 为例：232 个音符、跨度 139.3 秒，切成 4 片。
+注意脚本是**一片一个请求**，各扣 1 个额度；若要省额度，可改为一次请求提交多片
+（上限见 [api_doc](/api/docs/api_doc.md) 第 4 节）。
 
 ## 贡献
 

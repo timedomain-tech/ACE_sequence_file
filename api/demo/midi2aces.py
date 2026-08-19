@@ -121,7 +121,7 @@ def cut_aces(aces):
     version = aces["version"]
     original_note_list = aces["notes"]
 
-    MAX_LENGTH = 18  # Maximum length is 18 seconds
+    MAX_LENGTH = 90  # 单个 aces 文件的时长上限(见 docs/aces_file.md 5.7)
     CORASE_SPACE = 1.2  # 空隙大于1.2s则分割
 
     # 先过滤一下超长的note
@@ -136,20 +136,13 @@ def cut_aces(aces):
     def corase_cut(list_to_cut):
         corase_result = []
         temp_list = []
-        for i in range(len(list_to_cut)):
-            note = list_to_cut[i]
-            if i == 0:
-                temp_list.append(note)
-            else:
-                last_note = list_to_cut[i-1]
-                if note["start_time"] - last_note["end_time"] > CORASE_SPACE:
-                    corase_result.append(temp_list)
-                    temp_list = []
-                if i == len(list_to_cut) - 1:
-                    temp_list.append(note)
-                    corase_result.append(temp_list)
-                else:
-                    temp_list.append(note)
+        for i, note in enumerate(list_to_cut):
+            if i > 0 and note["start_time"] - list_to_cut[i - 1]["end_time"] > CORASE_SPACE:
+                corase_result.append(temp_list)
+                temp_list = []
+            temp_list.append(note)
+        if temp_list:
+            corase_result.append(temp_list)
 
         return corase_result
          
