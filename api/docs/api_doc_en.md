@@ -5,8 +5,13 @@
 
 ### 1. Synthesis API
 
-- Request URL: `https://api-lora-us.svsbusiness.com/engine/api/engine/2b_compose`
 - Request Method: `POST`
+- Request URL (use the one assigned to you during onboarding):
+  - Overseas: `https://api-lora-us.svsbusiness.com/engine/api/engine/2b_compose`
+  - China: `https://api.svsbusiness.com/engine/api/engine/2b_compose`
+
+> This document describes the behaviour of the **overseas node**. For the engine version used by
+> the China node, please confirm with your contact.
 
 #### Request Parameters
 
@@ -16,33 +21,32 @@
 | cooperator     | string | Yes      | Requester name (Contact the liaison to obtain)                                                                                          |
 | mix_info       | string | No       | Parameters for mixed tuning, selecting the sources you want to mix. Must be on the singer list and feature description                  |
 | speaker_id     | string | No       | Effective when `mix_info` is not set. Single source of synthesis, refer to the list of singers and feature description. Default is "1". |
-| extra          | string | 否        | Users can input any string, which will be filled into the returned data structure                                                       |
+| extra          | string | No       | Users can input any string, which will be filled into the returned data structure                                                       |
+| file           | file   | Yes      | The ACES file itself; the multipart field name must be `file`. Repeat the field to submit several pieces in one request                  |
 
-**Note**: Each request file must have a synthesis duration shorter than 18 seconds, and the number of uploaded files should not exceed 4.
+**Note**: Each request file must have a synthesis duration of at most 90 seconds, and the number of uploaded files should not exceed 3.
 
 #### Voice Blending Feature Explanation
-Through the interface, you can achieve the desired voice by more nuanced tone blending. You can control the different blending ratios based on the following 7 dimensions:
 
-- <font color=#0099ff>duration</font> mainly controls the articulation
-- <font color=#0099ff>pitch</font> mainly controls the singing style, and it also affects some aspects of articulation
-- <font color=#0099ff>air</font> controls the amount of breathiness in singing
-- <font color=#0099ff>falsetto</font> controls the amount of falsetto in singing
-- <font color=#0099ff>tension</font> controls the tension/relaxation of the vocal cords during singing
-- <font color=#0099ff>energy</font> controls the intensity of singing
-- <font color=#0099ff>mel</font> primarily controls the basic timbre
+You can blend the timbres of several singers to obtain the voice you want. The blending ratio is
+given by the `mel` dimension; each item is `[singer_id, weight]` and the weights are normalised
+automatically (you do not have to make them sum to 1).
 
-To understand the tone blending more intuitively, here's an example: currently, there are two singers with IDs 1 and 82. If we want to sound 30% like singer 1 and 70% like singer 82 in the above dimensions, then we can create a mix_info with the following JSON string to achieve this function:
+For example, to sound 70% like singer 82 and 30% like singer 1:
+
 ```python
 {
-    "duration": [[82, 0.7], [1, 0.3]],
-    "pitch": [[82, 0.7], [1, 0.3]],
-    "air": [[82, 0.7], [1, 0.3]],
-    "falsetto": [[82, 0.7], [1, 0.3]],
-    "tension": [[82, 0.7], [1, 0.3]],
-    "energy": [[82, 0.7], [1, 0.3]],
-    "mel": [[82, 0.7], [1, 0.3]],
+    "mel": [[82, 0.7], [1, 0.3]]
 }
 ```
+
+> `mel` is the only key in `mix_info`; any other key returns `400`.
+>
+> - If you only need a single singer, just use the `speaker_id` parameter — no `mix_info` needed.
+> - Voice blending changes the **timbre itself**. Controlling **how much** breath / falsetto /
+>   tension / intensity the voice has is a separate matter — use the corresponding curves in
+>   `piece_params` inside the ACES file (see
+>   [ACES file specification](/docs/aces_file_en.md), section 3).
 
 #### Request Example
 
@@ -50,25 +54,25 @@ To understand the tone blending more intuitively, here's an example: currently, 
 import requests
 import json
 
-url = "XXXXXXXXXXX"
+url = "https://api-lora-us.svsbusiness.com/engine/api/engine/2b_compose"
+
+# Voice blending (optional). Only the mel dimension takes effect; weights are normalised.
 mix_str = json.dumps({
-    "duration": [[82, 0.7], [1, 0.3]],
-    "pitch": [[82, 0.7], [1, 0.3]],
-    "air": [[82, 0.7], [1, 0.3]],
-    "falsetto": [[82, 0.7], [1, 0.3]],
-    "tension": [[82, 0.7], [1, 0.3]],
-    "energy": [[82, 0.7], [1, 0.3]],
     "mel": [[82, 0.7], [1, 0.3]],
 })
 extra_str = json.dumps(
     {"request_id": "abcd1234"}
 )
-file_url = "/Users/root/demo/xiaoxingxing.aces"
-files = [('file', open(file_url, 'rb'))]
+# Submit several pieces at once by repeating ('file', ...)
+files = [
+    ('file', open("/path/to/piece_1.aces", 'rb')),
+    ('file', open("/path/to/piece_2.aces", 'rb')),
+]
 data_dict = {
     "ace_token": "XXXXXXXXXXXXXXXX",
     "cooperator": "XXXXXXXXXXXX",
-    "speaker_id": "3",
+    # Single singer via speaker_id (see the singer list); mix_info takes precedence if both are given
+    "speaker_id": "82",
     "mix_info": mix_str,
     "extra": extra_str,
 }
@@ -79,10 +83,27 @@ resp = requests.request("POST", url=url, files=files, data=data_dict)
 
 Data format explanation:
 
-| Parameter Name | Type   | Description                                                         |
-|----------------|--------|---------------------------------------------------------------------|
-| audio          | string | Audio URL returned                                                  |
-| pst            | number | Start time of the audio (calculated based on the notes in the file) |
+| Parameter Name       | Type   | Description                                                                                      |
+|----------------------|--------|--------------------------------------------------------------------------------------------------|
+| audio                | string | Pre-signed download URL for the audio; GET it directly, no auth header needed                    |
+| pst                  | number | Absolute time (seconds) of **sample 0** of this audio on the original project timeline           |
+| output_format_suffix | string | Audio file suffix, `ogg` by default                                                              |
+| sequence_index       | number | Index of the corresponding uploaded file, starting at 0, matching the order of the `file` fields  |
+
+**Audio format**: Ogg/Opus container by default, **48kHz**, VBR targeting 64kbps
+(measured around 70kbps on long pieces).
+
+> The engine synthesizes internally at 44.1kHz, but Opus only supports 48kHz natively, so the
+> encoder resamples to 48kHz — the file you download has a sample rate of 48000. Resample on
+> your side if you need 44.1kHz material.
+
+**The download URL is valid for 48 hours** (172800 seconds); fetch and store the audio within that
+window. The service does **not** cache synthesis results — resubmitting the same request
+synthesises again (and bills again), and the audio is not guaranteed to be byte-identical.
+
+**Submitting several pieces**: repeat the multipart `file` field; the returned `data` array maps to
+the submission order via `sequence_index`. If **any single piece fails the whole request fails**
+(not billed, and successfully rendered pieces are not returned) — retry the request as a whole.
 
 ```json
 {
@@ -107,7 +128,9 @@ Data format explanation:
 
 ### 2. Quota statistics
 
-- Request：`https://gateway-us.svsbusiness.com/bill/quota`
+- Request URL (not on the same host as the synthesis endpoint — use the one for your node):
+  - China: `https://gateway.svsbusiness.com/bill/quota`
+  - Overseas: `https://gateway-us.svsbusiness.com/bill/quota`
 - Request Method：`GET`
 
 #### Request Parameters
@@ -152,6 +175,29 @@ Data format explanation:
 | used_amount          | number | The amount already used by this token                                                        |
 | qps                  | number | The limit on the number of tokens synthesized per second for this token                      |
 
+**Billing granularity**
+
+- One **successful** synthesis request consumes exactly **1 credit**, regardless of the number of
+  pieces submitted, the duration of each piece, or how many singers are blended.
+- Requests returning a non-200 code are **not billed** (400 / 429 / 453 / 503 consume no credit).
+- `charging_strategy = 1` (quantity-based): each successful request increments `used_amount` by 1;
+  once it reaches `billing_balance` the synthesis endpoint returns 400.
+- `charging_strategy = 2` (time-package): credits are not decremented per call; only
+  `charging_expire_time` is checked, after which the endpoint returns 400.
+
+> **Credits are deducted asynchronously.** After a request returns `200`, `used_amount` takes a
+> few seconds to a few tens of seconds to update. Querying the quota immediately after a request
+> shows the old value; that is normal and does not mean the request was not billed.
+
+There are therefore two ways to reduce credit consumption, in order of importance:
+
+1. **First, fit the content into as few files as possible.** The per-file limit is 90 seconds
+   (see "4. Synthesis Constraints"). The engine infers on a fixed-length canvas, so synthesizing
+   5 seconds and 90 seconds cost about the same; slicing content up only makes the same audio
+   go through inference repeatedly.
+2. **Then batch several files into one request** (up to 3). The trade-off is that a single
+   failing piece requires retrying the whole request.
+
 ```json
 {
   "data": [
@@ -174,20 +220,29 @@ Data format explanation:
 ```
 ### 3. Response Status Codes
 
-| Status Code | Description                                                        |
-|-------------|--------------------------------------------------------------------|
-| 200         | Request successful                                                 |
-| 503         | Number of concurrent requests exceeds limit                        |
-| 400         | Request parameters do not conform to the documentation             |
-| 429         | Invalid token                                                      |
-| 402         | Synthesis engine exception, mostly due to extreme data in the file |
-| 453         | Internal server error                                              |
+| Status Code | Description                                                                          |
+|-------------|--------------------------------------------------------------------------------------|
+| 200         | Request successful                                                                   |
+| 400         | Request parameters or file content do not conform to the documentation; insufficient quota; qps limit exceeded |
+| 429         | Invalid token (cannot be decrypted)                                                  |
+| 453         | Data validation failed (the file contains extreme data) or synthesis engine exception |
+| 503         | Number of concurrent requests exceeds limit                                          |
+
+The HTTP status code always matches the `code` field in the response body. On failure `data`
+is `null` and the reason is in `error`, which usually contains the timestamp of the offending
+note and the field name so you can locate the problem.
+
+> **Exception**: `503` is returned by the gateway before the request reaches the service, so its
+> body is **not** JSON (it may be HTML). Check the HTTP status code before parsing the body —
+> do not assume `resp.json()` works for 503.
+
+> return `453`.
 
 ### 4. Synthesis Constraints
 
 | Constraint                        | Value                          | Description                                                   |
 |-----------------------------------|--------------------------------|---------------------------------------------------------------|
-| Limit on the number of pieces     | 4                              | The number of pieces in each request cannot exceed this limit |
-| Limit on the length of each piece | 18s                            | The length of each piece cannot exceed this time limit        |
-| Concurrent request limit          | 20                             | Exceeding this limit will result in a 503 error               |
-| query per second for single token | default 3，contact us to adjust | Exceeding this limit will not be allowed                      |
+| Limit on the number of pieces     | 3                              | The number of pieces in each request cannot exceed this limit |
+| Limit on the length of each piece | 90s                            | Measured as the notes time span; a 1200-phoneme cap also applies, see [ACES file specification](/docs/aces_file_en.md) 5.8 |
+| Concurrent request limit          | 20                             | **Node-level** cap shared by all customers; the gateway returns 503 beyond it — back off and retry |
+| Queries per second per token      | 3 by default, contact us to adjust | Enforced as an average over a **60-second rolling window** (rejected when requests in the window exceed qps x 60); returns 400 |
