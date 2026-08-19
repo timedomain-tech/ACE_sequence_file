@@ -28,8 +28,6 @@ Aces 是一个专为歌声合成设计的文件格式，它简单、开放、用
 | `vibrato_example.aces`        | 用 `pitch` 的 `user` + `delta` 做可控颤音              |
 | `param_example.aces`          | `energy` / `air` / `falsetto` / `tension` 参数曲线  |
 
-> `xiaoxingxing.aces` 与日文示例中还保留着 `energy.envelope` 的历史数据，当前引擎已不读取
-> 该层（见文件描述 3.2）。要控制这四个参数请参照 `param_example.aces`，写在 `user` 层。
 
 ## 贡献
 

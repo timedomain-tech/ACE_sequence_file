@@ -28,9 +28,6 @@ For specifics regarding the file format please refer to  [File Description](docs
 | `vibrato_example.aces`        | Controlled vibrato via the `user` + `delta` layers of `pitch`             |
 | `param_example.aces`          | `energy` / `air` / `falsetto` / `tension` parameter curves                |
 
-> `xiaoxingxing.aces` and the Japanese example still carry legacy `energy.envelope`
-> data, a layer the current engine no longer reads (see File Description 3.2). To
-> control those four parameters, follow `param_example.aces` and use the `user` layer.
 
 ## Contributing
 

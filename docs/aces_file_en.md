@@ -103,7 +103,7 @@ phonemes automatically, so `phone` is not required.
 
 > Effective layers: the `user` / `delta` layers of `pitch`, and the `user` layer of
 > `energy` / `air` / `falsetto` / `tension`. These five parameters and these layers are
-> all there is — other layers (such as `envelope`) return `400` if supplied, see 3.2.
+> all there is; any other field returns `400` with an explanation.
 
 Ready-to-submit examples:
 
@@ -159,12 +159,6 @@ Example:
 
 **All four parameters use the same `user` range, 0~1.** A negative value means
 "unspecified here, let the model predict it". Values outside 0~1 are clamped, not rejected.
-
-> **The `envelope` layer is no longer supported and returns `400` if supplied**
-> (rather than being silently ignored — silence would hand you a `200` and audio without
-> the dynamics you drew). `envelope` used to mean "multiply the model's predicted value",
-> and the caller cannot see that predicted value, nor can the server convert the envelope
-> into an equivalent absolute curve. Use the `user` layer with absolute 0~1 values instead.
 
 What the four parameters do perceptually: `energy` is loudness and intensity; `air` is
 the amount of breath; `falsetto` is the falsetto ratio (it weakens the upper harmonics,
@@ -242,10 +236,10 @@ Description:
 PAD is additional information that is usually not required. When the ACES file is used for deep learning model synthesis
 of singing voices, the note information before and after this segment can be added to obtain better synthesis results.
 
-> **Actual behaviour of the current engine**: `pad` can be omitted entirely — the service fills it
+> `pad` can be omitted entirely — the service fills it
 > in from the first/last note times and aligns it to the internal frame grid. If you do supply
 > `pad`, its `type` (`sp` / `br` / `sil` etc.) is honoured, but `start_time` / `end_time` are
-> recomputed. Some earlier clients use `pad_notes` as the field name; that is accepted as well.
+> recomputed. The field name `pad_notes` is accepted as well.
 
 Example:
 
@@ -292,32 +286,30 @@ To break the sound after a sustained note, place the `sp` / `br` **after** the `
 `general[0,1] + slur[1,2] + br[2,2.5]`.
 
 > Between ordinary (non-slur) notes you do not need an explicit `sp` — just leave a time gap and
-> the engine inserts the silence; see 5.11 for the limit.
-### 5.7 `consonant_time_head` / `consonant_time_tail` are no longer used by the current engine
-Supplying them causes no error but has no effect; consonant durations are decided by the model.
-### 5.8 Each aces file can only synthesize a notes list of no more than 90 seconds
+> the engine inserts the silence; see 5.10 for the limit.
+### 5.7 Each aces file can only synthesize a notes list of no more than 90 seconds
 Measured as the actual time span of the notes (largest `end_time` minus smallest `start_time`);
 exceeding it returns `400`.
 
-> The per-piece limit has been raised from the earlier 18s to 90s. The engine infers on a
-> fixed-length canvas, so synthesizing 5 seconds and 90 seconds cost about the same compute —
-> there is **no need to slice long passages into 18s fragments** any more, as that only makes
-> the same audio go through inference repeatedly. Prefer one file per complete passage.
+> The engine infers on a fixed-length canvas, so synthesizing 5 seconds and 90 seconds cost
+> about the same compute. **Prefer one file per complete passage** and do not slice content up:
+> slicing only makes the same audio go through inference repeatedly, which is both slower and
+> more expensive in credits.
 >
 > The other limit is a **total of 1200 phonemes** (summed over the notes, with breath notes and
 > engine-inserted silences counting as 1 each). Very dense material (fast rap, for example) can
 > hit this before reaching 90s; that returns `453` and reports the phoneme total.
-### 5.9 Speaker information must be provided
+### 5.8 Speaker information must be provided
 Supply it via the `speaker_id` or `mix_info` request parameter; the singer must be in the singer list.
-### 5.10 If you want to use piece_params field, you need to carefully check that the time range of piece_params cannot exceed the time range of the note list
+### 5.9 If you want to use piece_params field, you need to carefully check that the time range of piece_params cannot exceed the time range of the note list
 Parts outside the range are clipped automatically without an error.
-### 5.11 Silence between notes
+### 5.10 Silence between notes
 Long silences inside a piece are fine (an intro rest or an instrumental section can simply be
-left empty) as long as the whole span stays within the 90s limit of 5.8 — there is no need to
+left empty) as long as the whole span stays within the 90s limit of 5.7 — there is no need to
 split a piece just to skip over a gap. Ordinary notes do not need an explicit `sp` between
 them; leave a time gap and the engine fills in the silence.
 
-### 5.12 Notes must not overlap in time
+### 5.11 Notes must not overlap in time
 The service first sorts the notes by `start_time`, then requires every adjacent pair to satisfy
 `start_time of the later note >= end_time of the earlier note`. An overlap returns `453` with the
 exact position, e.g. `note at 0.8000s overlaps the previous note ending at 1.0000s`.

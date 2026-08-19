@@ -10,11 +10,8 @@
   - Overseas: `https://api-lora-us.svsbusiness.com/engine/api/engine/2b_compose`
   - China: `https://api.svsbusiness.com/engine/api/engine/2b_compose`
 
-> **This document describes the behaviour of the current engine version, which is fully rolled out
-> on the overseas node.** The China node will be upgraded separately; until then, the items marked
-> "current engine" in this document (blending using `mel` only, which `piece_params` layers take
-> effect, `consonant_time_*` no longer being used) still behave the earlier way there.
-> Contact your onboarding representative if you are unsure which version your node runs.
+> This document describes the behaviour of the **overseas node**. For the engine version used by
+> the China node, please confirm with your contact.
 
 #### Request Parameters
 
@@ -43,22 +40,13 @@ For example, to sound 70% like singer 82 and 30% like singer 1:
 }
 ```
 
-> **`mel` is the only blending dimension.**
->
-> Earlier versions let you set a different blending ratio for each of the 7 dimensions
-> `duration` / `pitch` / `air` / `falsetto` / `tension` / `energy` / `mel`. The current engine
-> uses a single unified timbre representation with only one voice vector, so **only `mel`
-> is kept**; supplying any of the other six returns `400`.
->
-> Why an error rather than silently ignoring it: silence would hand you a `200` and audio
-> with the wrong timbre, with no way to tell from the response what went wrong.
+> `mel` is the only key in `mix_info`; any other key returns `400`.
 >
 > - If you only need a single singer, just use the `speaker_id` parameter — no `mix_info` needed.
-> - To control **how much** breath / falsetto / tension / intensity the voice has, use the
->   `air` / `falsetto` / `tension` / `energy` curves in `piece_params` inside the ACES file
->   (see [ACES file specification](/docs/aces_file_en.md), section 3). Note this is not the
->   same as "borrowing another singer's characteristic in that dimension" — the former draws
->   a 0~1 intensity curve, the latter is not supported by the current engine.
+> - Voice blending changes the **timbre itself**. Controlling **how much** breath / falsetto /
+>   tension / intensity the voice has is a separate matter — use the corresponding curves in
+>   `piece_params` inside the ACES file (see
+>   [ACES file specification](/docs/aces_file_en.md), section 3).
 
 #### Request Example
 
@@ -198,9 +186,9 @@ Data format explanation:
 There are therefore two ways to reduce credit consumption, in order of importance:
 
 1. **First, fit the content into as few files as possible.** The per-file limit is 90 seconds
-   (see "4. Synthesis Constraints"). Do not slice content up to satisfy the earlier 18-second
-   limit — the engine infers on a fixed-length canvas, so synthesizing 5 seconds and 90 seconds
-   cost about the same, and slicing only makes the same audio go through inference repeatedly.
+   (see "4. Synthesis Constraints"). The engine infers on a fixed-length canvas, so synthesizing
+   5 seconds and 90 seconds cost about the same; slicing content up only makes the same audio
+   go through inference repeatedly.
 2. **Then batch several files into one request** (up to 3). The trade-off is that a single
    failing piece requires retrying the whole request.
 
@@ -242,7 +230,6 @@ note and the field name so you can locate the problem.
 > body is **not** JSON (it may be HTML). Check the HTTP status code before parsing the body —
 > do not assume `resp.json()` works for 503.
 
-> The `402` code from earlier documentation is no longer used; data-related errors now
 > return `453`.
 
 ### 4. Synthesis Constraints
